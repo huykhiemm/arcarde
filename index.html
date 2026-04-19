@@ -1,896 +1,38 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KhiemHuy Dev Arcade</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0a0a0f;
-    --bg2: #111118;
-    --bg3: #1a1a24;
-    --surface: #1e1e2e;
-    --surface2: #252535;
-    --border: rgba(255,255,255,0.07);
-    --border2: rgba(255,255,255,0.13);
-    --text: #e8e8f0;
-    --text2: #9090aa;
-    --text3: #5a5a70;
-    --accent: #7c6ff7;
-    --accent2: #5b52d4;
-    --accent3: #a99eff;
-    --green: #2ecc71;
-    --red: #e74c3c;
-    --amber: #f39c12;
-    --cyan: #00d4ff;
-    --pink: #ff6b9d;
-    --glow: rgba(124,111,247,0.15);
-    --mono: 'JetBrains Mono', monospace;
-    --sans: 'Space Grotesk', sans-serif;
-    --display: 'Unbounded', sans-serif;
-    --radius: 12px;
-    --radius-sm: 8px;
-    --shadow: 0 4px 24px rgba(0,0,0,0.4);
-  }
-  [data-theme="light"] {
-    --bg: #f4f3ff;
-    --bg2: #eceaff;
-    --bg3: #e4e1ff;
-    --surface: #ffffff;
-    --surface2: #f8f7ff;
-    --border: rgba(80,70,200,0.1);
-    --border2: rgba(80,70,200,0.18);
-    --text: #1a1a2e;
-    --text2: #4a4a6a;
-    --text3: #8888aa;
-    --accent: #5b52d4;
-    --accent2: #4540bb;
-    --accent3: #7c6ff7;
-    --glow: rgba(91,82,212,0.1);
-    --shadow: 0 4px 24px rgba(91,82,212,0.12);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  
-  html { scroll-behavior: smooth; }
-  
-  body {
-    font-family: var(--sans);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-    transition: background 0.3s, color 0.3s;
-  }
-
-  /* ── GRID NOISE BACKGROUND ── */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(var(--border) 1px, transparent 1px),
-      linear-gradient(90deg, var(--border) 1px, transparent 1px);
-    background-size: 48px 48px;
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.5;
-  }
-
-  /* ── NAVBAR ── */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 60px;
-    background: rgba(10,10,15,0.85);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    padding: 0 32px;
-    z-index: 1000;
-    gap: 0;
-    transition: background 0.3s;
-  }
-  [data-theme="light"] nav { background: rgba(244,243,255,0.85); }
-
-  .nav-logo {
-    font-family: var(--display);
-    font-size: 15px;
-    font-weight: 900;
-    letter-spacing: -0.5px;
-    color: var(--accent3);
-    margin-right: 40px;
-    white-space: nowrap;
-  }
-  .nav-logo span { color: var(--text3); font-weight: 400; font-size: 11px; display: block; letter-spacing: 0.5px; font-family: var(--sans); }
-
-  .nav-links { display: flex; align-items: center; gap: 4px; flex: 1; }
-
-  .nav-link {
-    position: relative;
-    padding: 6px 14px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text2);
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    transition: color 0.2s, background 0.2s;
-    white-space: nowrap;
-    border: none;
-    background: none;
-  }
-  .nav-link:hover { color: var(--text); background: var(--border); }
-  .nav-link.active { color: var(--accent3); background: var(--glow); }
-
-  .nav-badge {
-    display: inline-block;
-    font-size: 9px;
-    font-weight: 700;
-    padding: 1px 5px;
-    border-radius: 4px;
-    background: var(--accent);
-    color: #fff;
-    margin-left: 4px;
-    vertical-align: middle;
-    letter-spacing: 0.5px;
-  }
-
-  .nav-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-
-  .btn-theme {
-    width: 36px; height: 36px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border2);
-    background: var(--surface);
-    color: var(--text2);
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-    transition: all 0.2s;
-  }
-  .btn-theme:hover { background: var(--surface2); color: var(--text); }
-
-  /* ── PAGES ── */
-  .page { display: none; position: relative; z-index: 1; }
-  .page.active { display: block; }
-
-  /* ── HERO (HOME) ── */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 100px 32px 60px;
-    text-align: center;
-  }
-
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 16px;
-    border-radius: 100px;
-    border: 1px solid var(--border2);
-    background: var(--surface);
-    font-size: 12px;
-    color: var(--text2);
-    margin-bottom: 32px;
-    font-family: var(--mono);
-    letter-spacing: 0.5px;
-  }
-  .hero-badge::before {
-    content: '';
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 6px var(--green);
-  }
-
-  .hero-title {
-    font-family: var(--display);
-    font-size: clamp(36px, 6vw, 76px);
-    font-weight: 900;
-    line-height: 0.95;
-    letter-spacing: -2px;
-    margin-bottom: 24px;
-  }
-  .hero-title .line1 { display: block; color: var(--text); }
-  .hero-title .line2 { display: block; color: var(--accent3); }
-  .hero-title .line3 { display: block; color: var(--text3); font-weight: 300; font-size: 0.5em; letter-spacing: 4px; text-transform: uppercase; font-family: var(--sans); }
-
-  .hero-sub {
-    font-size: 16px;
-    color: var(--text2);
-    max-width: 500px;
-    line-height: 1.7;
-    margin-bottom: 48px;
-  }
-
-  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-
-  .btn-primary {
-    padding: 12px 28px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: var(--sans);
-    transition: all 0.2s;
-    letter-spacing: 0.3px;
-  }
-  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(124,111,247,0.3); }
-
-  .btn-ghost {
-    padding: 12px 28px;
-    background: transparent;
-    color: var(--text2);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: var(--sans);
-    transition: all 0.2s;
-  }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent3); background: var(--glow); }
-
-  /* ── GAME GRID ── */
-  .game-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-    padding: 0 32px 80px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
-  .game-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 28px;
-    cursor: pointer;
-    transition: all 0.25s;
-    position: relative;
-    overflow: hidden;
-  }
-  .game-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--card-color), transparent);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .game-card:hover { border-color: var(--border2); transform: translateY(-3px); box-shadow: var(--shadow); }
-  .game-card:hover::before { opacity: 1; }
-
-  .card-icon {
-    width: 48px; height: 48px;
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    margin-bottom: 16px;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-  }
-  .card-title {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 6px;
-  }
-  .card-desc { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 16px; }
-  .card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-  .tag {
-    font-size: 11px;
-    font-family: var(--mono);
-    padding: 3px 8px;
-    border-radius: 4px;
-    background: var(--bg3);
-    color: var(--text3);
-    border: 1px solid var(--border);
-  }
-  .tag.accent { background: var(--glow); color: var(--accent3); border-color: rgba(124,111,247,0.2); }
-
-  /* ── SECTION HEADERS ── */
-  .section-wrap { padding: 80px 32px 32px; max-width: 1100px; margin: 0 auto; }
-  .section-label {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--accent3);
-    margin-bottom: 8px;
-  }
-  .section-title {
-    font-family: var(--display);
-    font-size: clamp(24px, 4vw, 40px);
-    font-weight: 900;
-    letter-spacing: -1px;
-    color: var(--text);
-    margin-bottom: 12px;
-  }
-  .section-sub { font-size: 15px; color: var(--text2); max-width: 600px; line-height: 1.7; }
-
-  /* ── GAME PAGE LAYOUT ── */
-  .game-page { padding-top: 80px; min-height: 100vh; }
-
-  .game-header {
-    padding: 40px 32px 32px;
-    max-width: 900px;
-    margin: 0 auto;
-    display: flex;
-    align-items: flex-start;
-    gap: 20px;
-  }
-  .back-btn {
-    padding: 8px 16px;
-    border: 1px solid var(--border2);
-    border-radius: var(--radius-sm);
-    background: none;
-    color: var(--text2);
-    cursor: pointer;
-    font-size: 13px;
-    font-family: var(--sans);
-    display: flex; align-items: center; gap: 6px;
-    transition: all 0.2s;
-    white-space: nowrap;
-    margin-top: 4px;
-  }
-  .back-btn:hover { color: var(--text); border-color: var(--accent); }
-
-  /* ── ROCK PAPER SCISSORS GAME ── */
-  .rps-wrap {
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 0 32px 80px;
-  }
-
-  .score-bar {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 12px;
-    align-items: center;
-    margin-bottom: 32px;
-  }
-  .score-block {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    text-align: center;
-  }
-  .score-block.you { border-color: rgba(124,111,247,0.3); }
-  .score-block.cpu { border-color: rgba(231,76,60,0.25); }
-  .score-label { font-size: 11px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; font-family: var(--mono); margin-bottom: 4px; }
-  .score-num { font-family: var(--display); font-size: 36px; font-weight: 900; }
-  .score-block.you .score-num { color: var(--accent3); }
-  .score-block.cpu .score-num { color: var(--red); }
-  .vs-label { font-family: var(--display); font-size: 16px; font-weight: 900; color: var(--text3); text-align: center; }
-
-  .round-info {
-    text-align: center;
-    font-size: 13px;
-    color: var(--text2);
-    font-family: var(--mono);
-    margin-bottom: 24px;
-  }
-
-  .rps-arena {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 36px;
-    text-align: center;
-    margin-bottom: 24px;
-    min-height: 220px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-  }
-
-  .choices-display {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 16px;
-    align-items: center;
-    width: 100%;
-  }
-  .choice-box {
-    background: var(--bg3);
-    border: 2px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    text-align: center;
-  }
-  .choice-box.win { border-color: var(--green); background: rgba(46,204,113,0.05); }
-  .choice-box.lose { border-color: var(--red); background: rgba(231,76,60,0.05); }
-  .choice-box.draw { border-color: var(--amber); background: rgba(243,156,18,0.05); }
-  .choice-emoji { font-size: 52px; display: block; margin-bottom: 8px; }
-  .choice-name { font-size: 13px; color: var(--text2); font-family: var(--mono); }
-  .vs-badge { font-family: var(--display); font-size: 14px; font-weight: 900; color: var(--text3); }
-
-  .result-text {
-    font-family: var(--display);
-    font-size: 20px;
-    font-weight: 900;
-    letter-spacing: -0.5px;
-  }
-  .result-text.win { color: var(--green); }
-  .result-text.lose { color: var(--red); }
-  .result-text.draw { color: var(--amber); }
-
-  .reason-text { font-size: 13px; color: var(--text2); }
-
-  .rps-choices {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-  .rps-btn {
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius);
-    padding: 20px 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--sans);
-    color: var(--text);
-  }
-  .rps-btn:hover { border-color: var(--accent); background: var(--glow); transform: translateY(-2px); }
-  .rps-btn:active { transform: translateY(0); }
-  .rps-btn .emoji { font-size: 36px; }
-  .rps-btn .label { font-size: 13px; font-weight: 600; }
-  .rps-btn .key { font-size: 10px; color: var(--text3); font-family: var(--mono); }
-
-  .rps-controls {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-  }
-  .ctrl-btn {
-    padding: 8px 16px;
-    border-radius: var(--radius-sm);
-    font-size: 12px;
-    font-family: var(--mono);
-    font-weight: 500;
-    cursor: pointer;
-    border: 1px solid var(--border2);
-    background: var(--surface);
-    color: var(--text2);
-    transition: all 0.2s;
-  }
-  .ctrl-btn:hover { color: var(--text); border-color: var(--border2); }
-  .ctrl-btn.active { border-color: var(--accent); color: var(--accent3); background: var(--glow); }
-
-  .rps-log {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-top: 24px;
-    max-height: 220px;
-    overflow-y: auto;
-  }
-  .log-title { font-size: 11px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; font-family: var(--mono); margin-bottom: 12px; }
-  .log-entry {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 12px;
-    font-family: var(--mono);
-    color: var(--text2);
-  }
-  .log-entry:last-child { border-bottom: none; }
-  .log-r { width: 20px; color: var(--text3); }
-  .log-outcome { width: 46px; font-weight: 600; }
-  .log-outcome.W { color: var(--green); }
-  .log-outcome.L { color: var(--red); }
-  .log-outcome.D { color: var(--amber); }
-
-  /* ── ALGORITHM VISUALIZER ── */
-  .algo-wrap { max-width: 900px; margin: 0 auto; padding: 0 32px 80px; }
-
-  .algo-picker {
-    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px;
-  }
-  .algo-tab {
-    padding: 8px 18px;
-    border-radius: 100px;
-    border: 1px solid var(--border2);
-    background: var(--surface);
-    font-size: 12px; font-weight: 600;
-    color: var(--text2);
-    cursor: pointer;
-    font-family: var(--mono);
-    transition: all 0.2s;
-  }
-  .algo-tab:hover { color: var(--text); }
-  .algo-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-  .algo-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    margin-bottom: 20px;
-  }
-
-  .algo-canvas-wrap {
-    padding: 32px 28px 24px;
-    border-bottom: 1px solid var(--border);
-    min-height: 180px;
-    display: flex;
-    align-items: flex-end;
-    gap: 4px;
-    justify-content: center;
-  }
-
-  .bar {
-    background: var(--accent);
-    border-radius: 3px 3px 0 0;
-    transition: height 0.15s ease, background 0.15s;
-    min-width: 18px;
-    position: relative;
-  }
-  .bar.comparing { background: var(--amber); }
-  .bar.swapping { background: var(--red); }
-  .bar.sorted { background: var(--green); }
-  .bar.pivot { background: var(--cyan); }
-
-  .algo-info {
-    padding: 20px 28px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-
-  .algo-stat { display: flex; flex-direction: column; gap: 2px; }
-  .algo-stat-label { font-size: 10px; color: var(--text3); font-family: var(--mono); letter-spacing: 1px; text-transform: uppercase; }
-  .algo-stat-val { font-size: 18px; font-weight: 600; color: var(--text); font-family: var(--mono); }
-
-  .algo-controls { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
-
-  .vis-btn {
-    padding: 8px 16px;
-    border-radius: var(--radius-sm);
-    font-size: 12px; font-weight: 600;
-    font-family: var(--mono);
-    cursor: pointer;
-    border: 1px solid var(--border2);
-    background: var(--surface2);
-    color: var(--text);
-    transition: all 0.2s;
-  }
-  .vis-btn:hover { border-color: var(--accent); color: var(--accent3); }
-  .vis-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .vis-btn.primary:hover { background: var(--accent2); }
-  .vis-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .algo-explain {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px 24px;
-  }
-  .explain-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-  .explain-body { font-size: 13px; color: var(--text2); line-height: 1.7; }
-  .complexity-row { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
-  .complex-chip {
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 3px 10px;
-    border-radius: 4px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text2);
-  }
-  .complex-chip b { color: var(--accent3); }
-
-  /* ── CODE PREVIEW ── */
-  .code-wrap { max-width: 1000px; margin: 0 auto; padding: 0 32px 80px; }
-
-  .code-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-
-  .code-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg3);
-  }
-  .dot { width: 10px; height: 10px; border-radius: 50%; }
-  .dot.r { background: #ff5f57; }
-  .dot.y { background: #febc2e; }
-  .dot.g { background: #28c840; }
-  .code-file-name { font-family: var(--mono); font-size: 12px; color: var(--text3); margin-left: 8px; flex: 1; }
-
-  .lang-select {
-    padding: 4px 10px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border2);
-    background: var(--surface2);
-    color: var(--text);
-    font-size: 12px;
-    font-family: var(--mono);
-    cursor: pointer;
-  }
-
-  .code-area {
-    padding: 24px;
-    font-family: var(--mono);
-    font-size: 13px;
-    line-height: 1.8;
-    color: var(--text);
-    white-space: pre;
-    overflow-x: auto;
-    max-height: 480px;
-    overflow-y: auto;
-    tab-size: 2;
-  }
-
-  /* Syntax coloring */
-  .kw { color: #c792ea; }
-  .kw2 { color: #80cbc4; }
-  .str { color: #c3e88d; }
-  .num { color: #f78c6c; }
-  .cmt { color: #546e7a; font-style: italic; }
-  .fn { color: #82aaff; }
-  .cls { color: #ffcb6b; }
-  .op { color: #89ddff; }
-  .type { color: #f07178; }
-
-  [data-theme="light"] .kw { color: #7c4dff; }
-  [data-theme="light"] .kw2 { color: #00897b; }
-  [data-theme="light"] .str { color: #388e3c; }
-  [data-theme="light"] .num { color: #e64a19; }
-  [data-theme="light"] .cmt { color: #90a4ae; }
-  [data-theme="light"] .fn { color: #1565c0; }
-  [data-theme="light"] .cls { color: #f57f17; }
-  [data-theme="light"] .op { color: #0288d1; }
-  [data-theme="light"] .type { color: #c62828; }
-
-  /* ── CONVERTER PAGE ── */
-  .conv-wrap { max-width: 1000px; margin: 0 auto; padding: 0 32px 80px; }
-
-  .conv-grid {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 16px;
-    align-items: start;
-    margin-bottom: 20px;
-  }
-  @media (max-width: 700px) {
-    .conv-grid { grid-template-columns: 1fr; }
-    .conv-arrow { transform: rotate(90deg); }
-  }
-
-  .conv-block {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-  .conv-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg3);
-  }
-  .conv-lang-sel {
-    padding: 5px 10px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border2);
-    background: var(--surface2);
-    color: var(--text);
-    font-size: 12px;
-    font-family: var(--mono);
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .conv-textarea {
-    width: 100%;
-    min-height: 280px;
-    background: transparent;
-    border: none;
-    padding: 20px;
-    font-family: var(--mono);
-    font-size: 12.5px;
-    line-height: 1.8;
-    color: var(--text);
-    resize: vertical;
-    outline: none;
-  }
-  .conv-arrow-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding-top: 60px;
-  }
-  .conv-go-btn {
-    padding: 10px 16px;
-    background: var(--accent);
-    border: none;
-    border-radius: var(--radius-sm);
-    color: #fff;
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
-    font-family: var(--sans);
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .conv-go-btn:hover { background: var(--accent2); }
-  .conv-note { font-size: 11px; color: var(--text3); font-family: var(--mono); text-align: center; }
-
-  /* ── HISTORY / STATS PAGE ── */
-  .stats-wrap { max-width: 900px; margin: 0 auto; padding: 0 32px 80px; }
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 14px;
-    margin-bottom: 28px;
-  }
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-  }
-  .stat-card-label { font-size: 11px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; font-family: var(--mono); margin-bottom: 4px; }
-  .stat-card-val { font-size: 28px; font-weight: 700; font-family: var(--display); color: var(--text); }
-  .stat-card-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
-
-  .history-table { width: 100%; border-collapse: collapse; }
-  .history-table th {
-    font-size: 11px; font-family: var(--mono); letter-spacing: 1px; text-transform: uppercase;
-    color: var(--text3); padding: 8px 14px; text-align: left; border-bottom: 1px solid var(--border);
-  }
-  .history-table td { padding: 12px 14px; font-size: 13px; color: var(--text2); border-bottom: 1px solid var(--border); }
-  .history-table tr:last-child td { border-bottom: none; }
-  .history-table tr:hover td { background: var(--bg3); }
-  .outcome-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 700;
-    font-family: var(--mono);
-  }
-  .outcome-badge.W { background: rgba(46,204,113,0.1); color: var(--green); }
-  .outcome-badge.L { background: rgba(231,76,60,0.1); color: var(--red); }
-  .outcome-badge.D { background: rgba(243,156,18,0.1); color: var(--amber); }
-
-  /* ── FOOTER ── */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 24px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-    color: var(--text3);
-    font-family: var(--mono);
-    position: relative;
-    z-index: 1;
-  }
-  .footer-copy { display: flex; align-items: center; gap: 8px; }
-  .footer-copy::before { content: '©'; }
-
-  /* ── ABOUT PAGE ── */
-  .about-wrap { max-width: 800px; margin: 0 auto; padding: 0 32px 80px; }
-  .about-block {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 28px;
-    margin-bottom: 20px;
-  }
-  .about-block h3 { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--text); }
-  .about-block p { font-size: 14px; color: var(--text2); line-height: 1.8; margin-bottom: 8px; }
-  .code-inline {
-    display: inline;
-    font-family: var(--mono);
-    font-size: 12px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    padding: 1px 6px;
-    border-radius: 4px;
-    color: var(--accent3);
-  }
-  .feature-list { list-style: none; }
-  .feature-list li {
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-    color: var(--text2);
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .feature-list li:last-child { border-bottom: none; }
-  .feat-icon { color: var(--accent3); font-weight: 700; flex-shrink: 0; font-family: var(--mono); font-size: 11px; margin-top: 2px; }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .page.active .section-wrap,
-  .page.active .game-grid,
-  .page.active .rps-wrap,
-  .page.active .algo-wrap,
-  .page.active .code-wrap,
-  .page.active .conv-wrap,
-  .page.active .stats-wrap,
-  .page.active .about-wrap,
-  .page.active .hero {
-    animation: fadeUp 0.3s ease both;
-  }
-
-  @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(124,111,247,0); }
-    50% { box-shadow: 0 0 0 4px rgba(124,111,247,0.2); }
-  }
-  .rps-btn:focus-visible { animation: pulse-glow 1.5s infinite; outline: none; }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-  .loading { animation: spin 1s linear infinite; }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 5px; height: 5px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="KhiemHuy Dev Arcade — Nền tảng game giáo dục kết hợp thuật toán, trò chơi tương tác và developer tools. Học lập trình qua trải nghiệm thực tế.">
+  <meta name="keywords" content="game, algorithm, visualizer, 2048, caro, gomoku, sorting, markov chain, minimax, developer tools">
+  <meta name="author" content="KhiemHuy">
+  <title>KhiemHuy Dev Arcade — Game · Thuật toán · Developer Tools</title>
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
 <!-- ═══════════════════════ NAVBAR ═══════════════════════ -->
 <nav>
-  <div class="nav-logo">
-    KH<span>dev arcade · v2.0</span>
+  <div class="nav-logo" onclick="showPage('home')">
+    KH<span>dev arcade · v3.0</span>
   </div>
+
+  <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+
   <div class="nav-links">
     <button class="nav-link active" onclick="showPage('home')">Trang chủ</button>
     <button class="nav-link" onclick="showPage('games')">Trò chơi</button>
-    <button class="nav-link" onclick="showPage('algo')">Thuật toán <span class="nav-badge">VIS</span></button>
-    <button class="nav-link" onclick="showPage('code')">Code Preview</button>
-    <button class="nav-link" onclick="showPage('converter')">Converter <span class="nav-badge">BETA</span></button>
+    <button class="nav-link" onclick="showPage('algo')">Thuật toán <span class="nav-badge">7</span></button>
+    <button class="nav-link" onclick="showPage('code')">Mã nguồn</button>
+    <button class="nav-link" onclick="showPage('converter')">Chuyển đổi <span class="nav-badge">BETA</span></button>
     <button class="nav-link" onclick="showPage('stats')">Thống kê</button>
-    <button class="nav-link" onclick="showPage('about')">About</button>
+    <button class="nav-link" onclick="showPage('about')">Giới thiệu</button>
   </div>
+
+  <div class="nav-overlay" onclick="closeMobileMenu()"></div>
+
   <div class="nav-right">
     <button class="btn-theme" id="themeBtn" onclick="toggleTheme()" title="Bật/tắt sáng tối">🌙</button>
   </div>
@@ -899,14 +41,15 @@
 <!-- ═══════════════════════ HOME PAGE ═══════════════════════ -->
 <div class="page active" id="page-home">
   <div class="hero">
-    <div class="hero-badge">v2.0 · Thuật toán + Trò chơi + Developer Tools</div>
+    <div class="hero-badge">v3.0 · 3 Game + 7 Thuật toán + Developer Tools</div>
     <h1 class="hero-title">
       <span class="line1">KHIEMHUY</span>
       <span class="line2">DEV ARCADE</span>
       <span class="line3">Algorithm · Game · Learn</span>
     </h1>
     <p class="hero-sub">
-      Kho trò chơi tương tác kèm visualizer thuật toán. Dành cho developers muốn học, chơi, và hiểu sâu hơn về cách code hoạt động.
+      Nền tảng game giáo dục kết hợp thuật toán và trò chơi tương tác.
+      Học lập trình qua trải nghiệm — chơi, quan sát, hiểu sâu.
     </p>
     <div class="hero-actions">
       <button class="btn-primary" onclick="showPage('games')">🎮 Chơi ngay</button>
@@ -918,28 +61,28 @@
     <div class="section-label">// Danh mục</div>
     <div class="section-title" style="margin-bottom:28px;">Khám phá nền tảng</div>
 
-    <div class="game-grid" style="padding:0 0 0 0;">
+    <div class="game-grid" style="padding:0;">
       <div class="game-card" style="--card-color:var(--accent3);--card-bg:rgba(124,111,247,0.08);" onclick="showPage('games')">
         <div class="card-icon">🎮</div>
-        <div class="card-title">Game Collection</div>
-        <div class="card-desc">Oẳn tù tì với AI thông minh sử dụng Markov Chain. Sắp ra thêm nhiều game mới.</div>
-        <div class="card-tags"><span class="tag accent">Markov AI</span><span class="tag">BestOf 1/3/5</span><span class="tag">PvP</span></div>
+        <div class="card-title">Trò chơi</div>
+        <div class="card-desc">3 trò chơi với AI thông minh: Oẳn tù tì, 2048, và Caro. Mỗi game sử dụng thuật toán khác nhau.</div>
+        <div class="card-tags"><span class="tag accent">Markov AI</span><span class="tag">Minimax</span><span class="tag">3 Games</span></div>
       </div>
       <div class="game-card" style="--card-color:var(--cyan);--card-bg:rgba(0,212,255,0.06);" onclick="showPage('algo')">
         <div class="card-icon">📊</div>
-        <div class="card-title">Algorithm Visualizer</div>
-        <div class="card-desc">Xem trực quan các thuật toán sắp xếp hoạt động từng bước. Bubble, Quick, Merge, Insertion.</div>
-        <div class="card-tags"><span class="tag accent">Sorting</span><span class="tag">Step-by-step</span><span class="tag">Big-O</span></div>
+        <div class="card-title">Thuật toán</div>
+        <div class="card-desc">Xem trực quan 7 thuật toán sắp xếp hoạt động từng bước. Bubble, Quick, Merge, Heap, Counting...</div>
+        <div class="card-tags"><span class="tag accent">7 Algorithms</span><span class="tag">Step-by-step</span><span class="tag">Big-O</span></div>
       </div>
       <div class="game-card" style="--card-color:var(--green);--card-bg:rgba(46,204,113,0.06);" onclick="showPage('code')">
         <div class="card-icon">💻</div>
-        <div class="card-title">Code Preview</div>
-        <div class="card-desc">Xem source code game với syntax highlighting. Tham chiếu thuật toán C# gốc đã được refactor.</div>
-        <div class="card-tags"><span class="tag accent">C# Refactored</span><span class="tag">Syntax HL</span></div>
+        <div class="card-title">Mã nguồn</div>
+        <div class="card-desc">Xem source code game với syntax highlighting. Tham chiếu thuật toán C#, JavaScript, Python, Java.</div>
+        <div class="card-tags"><span class="tag accent">4 Ngôn ngữ</span><span class="tag">Syntax HL</span></div>
       </div>
       <div class="game-card" style="--card-color:var(--pink);--card-bg:rgba(255,107,157,0.06);" onclick="showPage('converter')">
         <div class="card-icon">🔄</div>
-        <div class="card-title">Language Converter</div>
+        <div class="card-title">Chuyển đổi code</div>
         <div class="card-desc">Chuyển đổi code giữa C#, Python, JavaScript, Java. Tính năng beta — powered by AI.</div>
         <div class="card-tags"><span class="tag accent">AI-powered</span><span class="tag">Beta</span><span class="tag">4 ngôn ngữ</span></div>
       </div>
@@ -961,17 +104,17 @@
       <div class="card-desc">CPU dùng Markov Chain + Pattern Detection để dự đoán nước đi của bạn. Càng chơi, CPU càng thông minh.</div>
       <div class="card-tags"><span class="tag accent">Markov Chain</span><span class="tag">Pattern AI</span><span class="tag">BestOf</span></div>
     </div>
-    <div class="game-card" style="--card-color:var(--text3);--card-bg:var(--bg3);opacity:0.6;cursor:default;">
+    <div class="game-card" style="--card-color:var(--amber);--card-bg:rgba(243,156,18,0.06);" onclick="showPage('game2048')">
       <div class="card-icon">🧩</div>
-      <div class="card-title">2048 <span style="font-size:11px;color:var(--text3)">sắp ra</span></div>
-      <div class="card-desc">Greedy algorithm + Expectimax. Đang phát triển...</div>
-      <div class="card-tags"><span class="tag">Greedy</span><span class="tag">Coming Soon</span></div>
+      <div class="card-title">2048</div>
+      <div class="card-desc">Trượt các ô số để gộp chúng lại. Đạt ô 2048 để chiến thắng! Hỗ trợ cả bàn phím và vuốt cảm ứng.</div>
+      <div class="card-tags"><span class="tag accent">Greedy</span><span class="tag">Keyboard</span><span class="tag">Touch</span></div>
     </div>
-    <div class="game-card" style="--card-color:var(--text3);--card-bg:var(--bg3);opacity:0.6;cursor:default;">
+    <div class="game-card" style="--card-color:var(--cyan);--card-bg:rgba(0,212,255,0.06);" onclick="showPage('caro')">
       <div class="card-icon">♟️</div>
-      <div class="card-title">Caro AI <span style="font-size:11px;color:var(--text3)">sắp ra</span></div>
-      <div class="card-desc">Minimax với Alpha-Beta pruning. Đang phát triển...</div>
-      <div class="card-tags"><span class="tag">Minimax</span><span class="tag">Coming Soon</span></div>
+      <div class="card-title">Caro vs AI</div>
+      <div class="card-desc">Đấu với AI sử dụng Minimax + Alpha-Beta Pruning. 3 mức độ: Dễ, Trung bình, Khó. Bàn cờ 15×15.</div>
+      <div class="card-tags"><span class="tag accent">Minimax</span><span class="tag">Alpha-Beta</span><span class="tag">3 Levels</span></div>
     </div>
   </div>
 </div>
@@ -990,9 +133,9 @@
     <div class="rps-wrap">
       <!-- Mode + BestOf -->
       <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
-        <span style="font-size:12px;color:var(--text3);font-family:var(--mono);">MODE:</span>
+        <span style="font-size:12px;color:var(--text3);font-family:var(--mono);">CHẾ ĐỘ:</span>
         <button class="ctrl-btn active" id="modeBtn" onclick="toggleMode()">🤖 vs CPU</button>
-        <span style="font-size:12px;color:var(--text3);font-family:var(--mono);margin-left:8px;">BEST OF:</span>
+        <span style="font-size:12px;color:var(--text3);font-family:var(--mono);margin-left:8px;">SỐ VÁN:</span>
         <button class="ctrl-btn active" id="bo1Btn" onclick="setBestOf(1)">1</button>
         <button class="ctrl-btn" id="bo3Btn" onclick="setBestOf(3)">3</button>
         <button class="ctrl-btn" id="bo5Btn" onclick="setBestOf(5)">5</button>
@@ -1075,8 +218,100 @@
       <!-- AI Insight -->
       <div style="margin-top:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
         <div class="log-title">🧠 Markov AI — Trạng thái hiện tại</div>
-        <div id="aiInsight" style="font-size:12px;color:var(--text2);font-family:var(--mono);line-height:1.8;">
-          CPU chưa có dữ liệu. Hãy chơi vài ván để AI học pattern của bạn.
+        <div id="aiInsight" style="font-size:12px;color:var(--text2);font-family:var(--mono);line-height:1.8;white-space:pre-wrap;">
+CPU chưa có dữ liệu. Hãy chơi vài ván để AI học pattern của bạn.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ 2048 GAME ═══════════════════════ -->
+<div class="page" id="page-game2048">
+  <div class="game-page">
+    <div class="game-header">
+      <button class="back-btn" onclick="showPage('games')">← Quay lại</button>
+      <div>
+        <div class="section-label">// Puzzle Game</div>
+        <div class="section-title" style="font-size:24px;margin-bottom:0;">2048</div>
+      </div>
+    </div>
+
+    <div class="game-2048-wrap">
+      <div class="game-2048-header">
+        <div class="game-2048-scores">
+          <div class="score-box-2048">
+            <div class="s-label">Điểm</div>
+            <div class="s-val" id="score2048">0</div>
+          </div>
+          <div class="score-box-2048 best">
+            <div class="s-label">Kỷ lục</div>
+            <div class="s-val" id="best2048">0</div>
+          </div>
+        </div>
+        <div class="game-2048-controls">
+          <button class="ctrl-btn" onclick="init2048()">↺ Chơi lại</button>
+        </div>
+      </div>
+
+      <div class="game-2048-board" id="board2048"></div>
+
+      <div class="game-2048-hint">
+        ⌨️ Dùng phím mũi tên hoặc WASD · 📱 Vuốt trên bàn cờ để di chuyển
+      </div>
+
+      <!-- Algorithm explanation -->
+      <div style="margin-top:24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+        <div class="log-title">💡 Thuật toán trong 2048</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.8;">
+          <strong style="color:var(--text);">Cách chơi:</strong> Trượt các ô theo 4 hướng. Hai ô cùng giá trị sẽ gộp lại thành ô gấp đôi. Đạt ô 2048 để thắng!<br><br>
+          <strong style="color:var(--text);">Greedy Algorithm:</strong> Mỗi nước đi, game tìm cách gộp các ô cùng giá trị theo hướng chọn. Chiến lược tối ưu: giữ ô lớn nhất ở một góc, xây dựng dãy giảm dần.<br><br>
+          <strong style="color:var(--text);">Expectimax:</strong> AI chơi 2048 thường dùng Expectimax — biến thể Minimax nhưng nút random (ô mới xuất hiện) tính kỳ vọng thay vì min/max.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ CARO GAME ═══════════════════════ -->
+<div class="page" id="page-caro">
+  <div class="game-page">
+    <div class="game-header">
+      <button class="back-btn" onclick="showPage('games')">← Quay lại</button>
+      <div>
+        <div class="section-label">// Strategy Game</div>
+        <div class="section-title" style="font-size:24px;margin-bottom:0;">Caro vs AI</div>
+      </div>
+    </div>
+
+    <div class="caro-wrap">
+      <div class="caro-controls">
+        <span style="font-size:12px;color:var(--text3);font-family:var(--mono);">ĐỘ KHÓ:</span>
+        <button class="ctrl-btn caro-diff-btn" data-level="easy" onclick="setCaroDifficulty('easy')">🟢 Dễ</button>
+        <button class="ctrl-btn caro-diff-btn active" data-level="medium" onclick="setCaroDifficulty('medium')">🟡 Trung bình</button>
+        <button class="ctrl-btn caro-diff-btn" data-level="hard" onclick="setCaroDifficulty('hard')">🔴 Khó</button>
+        <button class="ctrl-btn" onclick="initCaro()" style="margin-left:auto;">↺ Chơi lại</button>
+      </div>
+
+      <div class="caro-status" id="caroStatus">Lượt của bạn (X) — Hãy đặt quân!</div>
+
+      <div class="caro-board-container">
+        <div class="caro-board" id="caroBoard"></div>
+      </div>
+
+      <!-- Algorithm explanation -->
+      <div class="caro-info">
+        <div class="log-title">🧠 Thuật toán AI — Minimax + Alpha-Beta Pruning</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.8;">
+          <strong style="color:var(--text);">Minimax:</strong> AI mô phỏng tất cả nước đi có thể, giả định đối thủ luôn chơi tối ưu. AI chọn nước đi tốt nhất cho mình (maximize) khi đối thủ chọn nước tệ nhất cho AI (minimize).<br><br>
+          <strong style="color:var(--text);">Alpha-Beta Pruning:</strong> Tối ưu Minimax bằng cách cắt tỉa các nhánh không cần thiết. Giảm số nút cần duyệt từ O(b^d) xuống O(b^(d/2)) trong trường hợp tốt nhất.<br><br>
+          <strong style="color:var(--text);">Heuristic:</strong> Đánh giá bàn cờ dựa trên pattern: live-4, dead-4, live-3, blocked-3... Mỗi pattern có điểm số khác nhau.
+        </div>
+        <div class="complexity-row" style="margin-top:12px;">
+          <span class="complex-chip">Dễ: <b>Depth 1</b></span>
+          <span class="complex-chip">TB: <b>Depth 2</b></span>
+          <span class="complex-chip">Khó: <b>Depth 3</b></span>
+          <span class="complex-chip">Pruning: <b>Alpha-Beta</b></span>
         </div>
       </div>
     </div>
@@ -1093,20 +328,22 @@
 
   <div class="algo-wrap">
     <div class="algo-picker">
-      <button class="algo-tab active" onclick="setAlgo('bubble')">Bubble Sort</button>
-      <button class="algo-tab" onclick="setAlgo('insertion')">Insertion Sort</button>
-      <button class="algo-tab" onclick="setAlgo('selection')">Selection Sort</button>
-      <button class="algo-tab" onclick="setAlgo('quick')">Quick Sort</button>
-      <button class="algo-tab" onclick="setAlgo('merge')">Merge Sort</button>
+      <button class="algo-tab active" data-algo="bubble" onclick="setAlgo('bubble')">Bubble Sort</button>
+      <button class="algo-tab" data-algo="insertion" onclick="setAlgo('insertion')">Insertion Sort</button>
+      <button class="algo-tab" data-algo="selection" onclick="setAlgo('selection')">Selection Sort</button>
+      <button class="algo-tab" data-algo="quick" onclick="setAlgo('quick')">Quick Sort</button>
+      <button class="algo-tab" data-algo="merge" onclick="setAlgo('merge')">Merge Sort</button>
+      <button class="algo-tab" data-algo="heap" onclick="setAlgo('heap')">Heap Sort</button>
+      <button class="algo-tab" data-algo="counting" onclick="setAlgo('counting')">Counting Sort</button>
     </div>
 
     <div class="algo-panel">
       <div class="algo-canvas-wrap" id="algoCanvas"></div>
       <div class="algo-info">
-        <div class="algo-stat"><div class="algo-stat-label">Comparisons</div><div class="algo-stat-val" id="statComp">0</div></div>
-        <div class="algo-stat"><div class="algo-stat-label">Swaps</div><div class="algo-stat-val" id="statSwap">0</div></div>
-        <div class="algo-stat"><div class="algo-stat-label">Size</div><div class="algo-stat-val" id="statSize">20</div></div>
-        <div class="algo-stat"><div class="algo-stat-label">Speed</div>
+        <div class="algo-stat"><div class="algo-stat-label">So sánh</div><div class="algo-stat-val" id="statComp">0</div></div>
+        <div class="algo-stat"><div class="algo-stat-label">Đổi chỗ</div><div class="algo-stat-val" id="statSwap">0</div></div>
+        <div class="algo-stat"><div class="algo-stat-label">Kích thước</div><div class="algo-stat-val" id="statSize">20</div></div>
+        <div class="algo-stat"><div class="algo-stat-label">Tốc độ</div>
           <select id="speedSel" style="font-size:14px;font-weight:600;background:transparent;border:none;color:var(--text);font-family:var(--mono);cursor:pointer;" onchange="setSpeed(this.value)">
             <option value="300">Chậm</option>
             <option value="100" selected>Vừa</option>
@@ -1117,8 +354,8 @@
         <div class="algo-controls">
           <button class="vis-btn" onclick="randomizeArray()">⟳ Mảng mới</button>
           <input type="range" min="5" max="40" value="20" id="sizeSlider" oninput="resizeArray(this.value)" style="width:80px;vertical-align:middle;" title="Kích thước mảng">
-          <button class="vis-btn primary" id="sortBtn" onclick="startSort()">▶ Sort</button>
-          <button class="vis-btn" id="pauseBtn" onclick="pauseSort()" disabled>⏸ Pause</button>
+          <button class="vis-btn primary" id="sortBtn" onclick="startSort()">▶ Sắp xếp</button>
+          <button class="vis-btn" id="pauseBtn" onclick="pauseSort()" disabled>⏸ Tạm dừng</button>
         </div>
       </div>
     </div>
@@ -1131,8 +368,8 @@
 <div class="page" id="page-code">
   <div class="section-wrap">
     <div class="section-label">// Source Code</div>
-    <div class="section-title">Code Preview</div>
-    <div class="section-sub">Source code của game với syntax highlighting. Code C# gốc đã được refactor theo chuẩn senior.</div>
+    <div class="section-title">Xem mã nguồn</div>
+    <div class="section-sub">Source code của game với syntax highlighting. Thuật toán được triển khai bằng 4 ngôn ngữ khác nhau.</div>
   </div>
 
   <div class="code-wrap">
@@ -1158,8 +395,8 @@
 <div class="page" id="page-converter">
   <div class="section-wrap">
     <div class="section-label">// Language Converter</div>
-    <div class="section-title">Code Converter <span class="nav-badge" style="font-size:11px;vertical-align:middle;">BETA</span></div>
-    <div class="section-sub">Paste code vào ô bên trái, chọn ngôn ngữ nguồn và đích, rồi bấm Convert. AI sẽ chuyển đổi logic và cú pháp.</div>
+    <div class="section-title">Chuyển đổi code <span class="nav-badge" style="font-size:11px;vertical-align:middle;">BETA</span></div>
+    <div class="section-sub">Paste code vào ô bên trái, chọn ngôn ngữ nguồn và đích, rồi bấm Chuyển đổi. AI sẽ chuyển đổi logic và cú pháp.</div>
   </div>
 
   <div class="conv-wrap">
@@ -1178,7 +415,7 @@
       </div>
 
       <div class="conv-arrow-wrap">
-        <button class="conv-go-btn" onclick="runConvert()">Convert →</button>
+        <button class="conv-go-btn" onclick="runConvert()">Chuyển đổi →</button>
         <div class="conv-note">AI-powered</div>
         <div class="conv-note" style="margin-top:4px;">claude-sonnet</div>
       </div>
@@ -1198,8 +435,8 @@
     </div>
 
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-      <button class="vis-btn" onclick="loadSampleCode()">📄 Load sample (RPS Rules)</button>
-      <button class="vis-btn" onclick="copyConvOutput()">📋 Copy output</button>
+      <button class="vis-btn" onclick="loadSampleCode()">📄 Tải mẫu (RPS Rules)</button>
+      <button class="vis-btn" onclick="copyConvOutput()">📋 Copy kết quả</button>
       <div id="convStatus" style="font-size:12px;color:var(--text3);font-family:var(--mono);margin-left:auto;"></div>
     </div>
 
@@ -1209,12 +446,12 @@
       <div class="game-grid" style="padding:0;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));">
         <div class="game-card" style="--card-color:var(--accent3);--card-bg:rgba(124,111,247,0.06);cursor:default;">
           <div class="card-title" style="font-size:14px;">C# (.NET)</div>
-          <div class="card-desc" style="font-size:12px;">Strongly typed, OOP. Dùng cho game engines (Unity), enterprise apps. Cú pháp rõ ràng, performance cao.</div>
+          <div class="card-desc" style="font-size:12px;">Strongly typed, OOP. Dùng cho game engines (Unity), enterprise apps. Cú pháp rõ ràng, hiệu năng cao.</div>
           <div class="card-tags"><span class="tag">OOP</span><span class="tag">Static typing</span><span class="tag">LINQ</span></div>
         </div>
         <div class="game-card" style="--card-color:var(--amber);--card-bg:rgba(243,156,18,0.06);cursor:default;">
           <div class="card-title" style="font-size:14px;">Python</div>
-          <div class="card-desc" style="font-size:12px;">Dynamic typing, dễ đọc. Thống trị AI/ML, scripting, data science. Cộng đồng lớn.</div>
+          <div class="card-desc" style="font-size:12px;">Dynamic typing, dễ đọc. Thống trị AI/ML, scripting, data science. Cộng đồng lớn nhất thế giới.</div>
           <div class="card-tags"><span class="tag">Dynamic</span><span class="tag">AI/ML</span><span class="tag">Scripting</span></div>
         </div>
         <div class="game-card" style="--card-color:var(--cyan);--card-bg:rgba(0,212,255,0.06);cursor:default;">
@@ -1237,10 +474,11 @@
   <div class="section-wrap">
     <div class="section-label">// Statistics</div>
     <div class="section-title">Thống kê của bạn</div>
+    <div class="section-sub">Theo dõi thành tích qua tất cả các trò chơi.</div>
   </div>
   <div class="stats-wrap">
     <div class="stats-grid" id="statsGrid"></div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+    <div class="history-table-wrap">
       <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
         <div style="font-size:13px;font-weight:600;color:var(--text);">Lịch sử trận đấu</div>
         <button class="ctrl-btn" onclick="clearHistory()">🗑 Xóa lịch sử</button>
@@ -1248,9 +486,9 @@
       <div style="overflow-x:auto;">
         <table class="history-table" id="historyTable">
           <thead><tr>
-            <th>#</th><th>Mode</th><th>Best Of</th><th>Bạn</th><th>Đối thủ</th><th>Kết quả</th><th>Thời gian</th>
+            <th>#</th><th>Trò chơi</th><th>Chi tiết</th><th>Tỉ số</th><th>Kết quả</th><th>Thời gian</th>
           </tr></thead>
-          <tbody id="historyBody"><tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px;">Chưa có trận nào.</td></tr></tbody>
+          <tbody id="historyBody"><tr><td colspan="6" style="text-align:center;color:var(--text3);padding:32px;">Chưa có trận nào.</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -1261,41 +499,95 @@
 <div class="page" id="page-about">
   <div class="section-wrap">
     <div class="section-label">// About</div>
-    <div class="section-title">KhiemHuy Dev Arcade</div>
-    <div class="section-sub">Một dự án cá nhân kết hợp game, thuật toán và developer tools.</div>
+    <div class="section-title">Giới thiệu</div>
   </div>
   <div class="about-wrap">
-    <div class="about-block">
-      <h3>🎯 Về dự án</h3>
-      <p>KhiemHuy Dev Arcade là một nền tảng game giáo dục, được xây dựng để giúp developers hiểu sâu hơn về cách các thuật toán hoạt động trong thực tế — thông qua việc chơi game và quan sát trực quan.</p>
-      <p>Toàn bộ logic game được port từ codebase C# gốc, đã được <strong>refactor theo chuẩn senior developer</strong>: tách biệt concerns, single responsibility principle, và clean architecture.</p>
+    <!-- Hero Card -->
+    <div class="about-hero">
+      <div class="about-avatar">KH</div>
+      <div class="about-hero-info">
+        <h2>KhiemHuy</h2>
+        <p>Học sinh đam mê công nghệ và lập trình. Xây dựng KhiemHuy Dev Arcade như một dự án cá nhân kết hợp game, thuật toán và developer tools — vừa học vừa tạo ra sản phẩm thực tế.</p>
+      </div>
     </div>
 
+    <!-- About Project -->
+    <div class="about-block">
+      <h3>🎯 Về dự án</h3>
+      <p>KhiemHuy Dev Arcade là nền tảng game giáo dục, xây dựng để giúp developers hiểu sâu hơn về thuật toán thông qua trải nghiệm tương tác — chơi game và quan sát trực quan.</p>
+      <p>Toàn bộ logic game được thiết kế với kiến trúc tách biệt concerns, áp dụng clean code principles, và có thể mở rộng dễ dàng trong tương lai.</p>
+    </div>
+
+    <!-- Skills -->
+    <div class="about-block">
+      <h3>🛠 Công nghệ sử dụng</h3>
+      <div class="skills-grid">
+        <div class="skill-tag">HTML5</div>
+        <div class="skill-tag">CSS3</div>
+        <div class="skill-tag">JavaScript</div>
+        <div class="skill-tag">C#</div>
+        <div class="skill-tag">Python</div>
+        <div class="skill-tag">Java</div>
+        <div class="skill-tag">Git</div>
+        <div class="skill-tag">Algorithms</div>
+        <div class="skill-tag">AI / ML</div>
+        <div class="skill-tag">Responsive</div>
+      </div>
+    </div>
+
+    <!-- Architecture -->
     <div class="about-block">
       <h3>⚙️ Kiến trúc hệ thống</h3>
       <ul class="feature-list">
         <li><span class="feat-icon">→</span><div><code class="code-inline">RulesEngine</code> — Dictionary-based rule lookup O(1), đảo ngược kết quả không cần duplicate rules.</div></li>
         <li><span class="feat-icon">→</span><div><code class="code-inline">MarkovChain</code> — Ma trận chuyển tiếp xác suất để dự đoán nước đi tiếp theo của người chơi.</div></li>
-        <li><span class="feat-icon">→</span><div><code class="code-inline">PatternDetector</code> — Sliding window 3-grams để phát hiện lặp lại pattern.</div></li>
-        <li><span class="feat-icon">→</span><div><code class="code-inline">HistoryStore</code> — localStorage với JSON serialization, tương tự JSON-lines trong C# gốc.</div></li>
-        <li><span class="feat-icon">→</span><div><code class="code-inline">AlgoVisualizer</code> — Generator-based step-by-step execution với async delay control.</div></li>
+        <li><span class="feat-icon">→</span><div><code class="code-inline">Minimax + α-β</code> — AI caro duyệt cây game tree với pruning tối ưu, heuristic đánh giá pattern.</div></li>
+        <li><span class="feat-icon">→</span><div><code class="code-inline">AlgoVisualizer</code> — Generator-based step-by-step execution với async delay control. 7 thuật toán sắp xếp.</div></li>
+        <li><span class="feat-icon">→</span><div><code class="code-inline">Modular JS</code> — Code được tách thành 8 module riêng biệt, dễ bảo trì và mở rộng.</div></li>
       </ul>
     </div>
 
+    <!-- Algorithms -->
     <div class="about-block">
       <h3>📚 Thuật toán được dùng</h3>
       <ul class="feature-list">
         <li><span class="feat-icon">AI</span><div><strong>Markov Chain (bậc 1)</strong> — CPU học từ transition matrix P(next | current). Mỗi ván chơi cập nhật ma trận.</div></li>
         <li><span class="feat-icon">AI</span><div><strong>3-gram Pattern Matching</strong> — Tìm subsequence giống nhau trong lịch sử để dự đoán nước tiếp theo.</div></li>
-        <li><span class="feat-icon">SORT</span><div><strong>Bubble / Insertion / Selection / Quick / Merge Sort</strong> — Visualizer step-by-step với async generators.</div></li>
+        <li><span class="feat-icon">AI</span><div><strong>Minimax + Alpha-Beta</strong> — Duyệt cây game tree cho Caro AI, cắt tỉa nhánh không cần thiết.</div></li>
+        <li><span class="feat-icon">SORT</span><div><strong>Bubble / Insertion / Selection / Quick / Merge / Heap / Counting Sort</strong> — 7 thuật toán sắp xếp với visualizer.</div></li>
         <li><span class="feat-icon">CONV</span><div><strong>AI Code Translation</strong> — Dùng LLM để chuyển đổi cú pháp giữa các ngôn ngữ lập trình.</div></li>
       </ul>
     </div>
 
+    <!-- Roadmap -->
+    <div class="about-block">
+      <h3>🗺 Lộ trình phát triển</h3>
+      <ul class="timeline">
+        <li>
+          <span class="tl-date">v1.0 — Phiên bản đầu tiên</span>
+          Game Oẳn tù tì cơ bản, giao diện đơn giản.
+        </li>
+        <li>
+          <span class="tl-date">v2.0 — Nâng cấp lớn</span>
+          Thêm Algorithm Visualizer, Code Preview, Language Converter. AI thông minh hơn.
+        </li>
+        <li>
+          <span class="tl-date">v3.0 — Hiện tại</span>
+          Game 2048, Caro vs AI, thêm Heap Sort & Counting Sort. Responsive, tách module, Việt hóa toàn bộ.
+        </li>
+        <li>
+          <span class="tl-date">v4.0 — Tương lai</span>
+          Thêm nhiều game mới (Snake AI, Sudoku Solver...), pathfinding visualizer, user accounts, leaderboard.
+        </li>
+      </ul>
+    </div>
+
+    <!-- Author -->
     <div class="about-block" style="border-color:rgba(124,111,247,0.3);">
       <h3>👨‍💻 Tác giả</h3>
       <p>Phát triển và thiết kế bởi <strong>KhiemHuy</strong>.</p>
-      <p style="color:var(--text3);font-size:12px;font-family:var(--mono);">© 2025 KhiemHuy · All rights reserved · v2.0.0</p>
+      <p>Dự án này là một phần trong hành trình học lập trình — từ ý tưởng đến sản phẩm hoàn chỉnh. Mọi đóng góp và phản hồi đều được trân trọng!</p>
+      <p style="color:var(--text3);font-size:12px;font-family:var(--mono);margin-top:8px;">© 2025 KhiemHuy · All rights reserved · v3.0.0</p>
     </div>
   </div>
 </div>
@@ -1304,884 +596,21 @@
 <footer>
   <div class="footer-copy">2025 KhiemHuy Dev Arcade · All rights reserved</div>
   <div style="display:flex;gap:16px;">
-    <span>v2.0.0</span>
+    <span>v3.0.0</span>
     <span style="color:var(--border2);">|</span>
     <span>Built with ♥ by KhiemHuy</span>
   </div>
 </footer>
 
-<!-- ═══════════════════════ JAVASCRIPT ═══════════════════════ -->
-<script>
-// ── THEME ──
-let currentTheme = localStorage.getItem('kh-theme') || 'dark';
-function applyTheme(t) {
-  currentTheme = t;
-  document.documentElement.setAttribute('data-theme', t);
-  document.getElementById('themeBtn').textContent = t === 'dark' ? '🌙' : '☀️';
-  localStorage.setItem('kh-theme', t);
-}
-function toggleTheme() { applyTheme(currentTheme === 'dark' ? 'light' : 'dark'); }
-applyTheme(currentTheme);
+<!-- ═══════════════════════ JAVASCRIPT MODULES ═══════════════════════ -->
+<script src="js/app.js"></script>
+<script src="js/rps.js"></script>
+<script src="js/game2048.js"></script>
+<script src="js/caro.js"></script>
+<script src="js/algo-visualizer.js"></script>
+<script src="js/code-preview.js"></script>
+<script src="js/converter.js"></script>
+<script src="js/stats.js"></script>
 
-// ── NAVIGATION ──
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-  const el = document.getElementById('page-' + id);
-  if (el) el.classList.add('active');
-  const map = { home:'Trang chủ', games:'Trò chơi', rps:'Trò chơi', algo:'Thuật toán', code:'Code Preview', converter:'Converter', stats:'Thống kê', about:'About' };
-  document.querySelectorAll('.nav-link').forEach(l => { if (l.textContent.trim().startsWith(map[id] || '')) l.classList.add('active'); });
-  window.scrollTo(0, 0);
-  if (id === 'stats') renderStats();
-  if (id === 'algo') initAlgo();
-  if (id === 'code') initCode();
-}
-
-// ── RPS GAME ENGINE ──
-const EMOJIS = { 1:'✂️', 2:'🔨', 3:'📄' };
-const NAMES  = { 1:'Kéo', 2:'Búa', 3:'Bao' };
-
-// Rules engine — O(1) lookup
-const RULES = { '1-3':'W','2-1':'W','3-2':'W','1-2':'L','2-3':'L','3-1':'L' };
-function getResult(p1, p2) {
-  if (p1 === p2) return { outcome:'D', reason:'Hòa — cùng lựa chọn.' };
-  const key = `${p1}-${p2}`;
-  const REASONS = { '1-3':'Kéo cắt Bao.','2-1':'Búa đập Kéo.','3-2':'Bao bọc Búa.','1-2':'Kéo thua Búa.','2-3':'Búa thua Bao.','3-1':'Bao thua Kéo.' };
-  return { outcome: RULES[key] || 'L', reason: REASONS[key] || '' };
-}
-
-// Markov AI
-class MarkovAI {
-  constructor() {
-    this.counts = {1:0,2:0,3:0};
-    this.markov = {1:{1:0,2:0,3:0},2:{1:0,2:0,3:0},3:{1:0,2:0,3:0}};
-    this.history = [];
-  }
-  observe(c) {
-    this.counts[c]++;
-    if (this.history.length) this.markov[this.history.at(-1)][c]++;
-    this.history.push(c);
-    if (this.history.length > 30) this.history.shift();
-  }
-  counterOf(c) { return c===1?2:c===2?3:1; }
-  choose(smart=true) {
-    if (!smart || this.history.length < 2) return Math.ceil(Math.random()*3);
-    // 3-gram pattern
-    if (this.history.length >= 3) {
-      const last3 = this.history.slice(-3);
-      const nc = {1:0,2:0,3:0};
-      for (let i=0;i+3<this.history.length;i++) {
-        if (this.history[i]===last3[0]&&this.history[i+1]===last3[1]&&this.history[i+2]===last3[2]) nc[this.history[i+3]]=(nc[this.history[i+3]]||0)+1;
-      }
-      if (Object.values(nc).reduce((a,b)=>a+b,0)>0) {
-        const pred = +Object.entries(nc).sort((a,b)=>b[1]-a[1])[0][0];
-        return Math.random()<0.8 ? this.counterOf(pred) : Math.ceil(Math.random()*3);
-      }
-    }
-    // Markov
-    const last = this.history.at(-1);
-    const row = this.markov[last];
-    if (Object.values(row).reduce((a,b)=>a+b,0)>0) {
-      const pred = +Object.entries(row).sort((a,b)=>b[1]-a[1])[0][0];
-      return Math.random()<0.7 ? this.counterOf(pred) : Math.ceil(Math.random()*3);
-    }
-    // Frequency
-    const most = +Object.entries(this.counts).sort((a,b)=>b[1]-a[1])[0][0];
-    return Math.random()<0.6 ? this.counterOf(most) : Math.ceil(Math.random()*3);
-  }
-  getInsight() {
-    const total = Object.values(this.counts).reduce((a,b)=>a+b,0);
-    if (!total) return 'CPU chưa có dữ liệu. Hãy chơi vài ván để AI học pattern của bạn.';
-    const pcts = [1,2,3].map(c=>({ c, p: ((this.counts[c]/total)*100).toFixed(0)+'%', n:NAMES[c] }));
-    const sorted = [...pcts].sort((a,b)=>b.counts-a.counts);
-    return `Tần suất lựa chọn của bạn:\n  Kéo: ${pcts[0].p}  Búa: ${pcts[1].p}  Bao: ${pcts[2].p}\n\nMarkov transitions (từ lần chọn cuối):\n` +
-      [1,2,3].map(c=>`  ${NAMES[c]} → Kéo:${this.markov[c][1]} Búa:${this.markov[c][2]} Bao:${this.markov[c][3]}`).join('\n');
-  }
-}
-
-let ai = new MarkovAI();
-let rpsState = { p1Wins:0, p2Wins:0, round:0, bestOf:1, mode:'pvcpu', smart:true, gameOver:false, history:[] };
-let pvpChoices = { p1:null, p2:null };
-let gameHistory = JSON.parse(localStorage.getItem('kh-history')||'[]');
-
-function setBestOf(n) {
-  rpsState.bestOf = n;
-  [1,3,5].forEach(x=>document.getElementById('bo'+x+'Btn').classList.toggle('active',x===n));
-  rpsReset();
-}
-function toggleMode() {
-  rpsState.mode = rpsState.mode==='pvcpu'?'pvp':'pvcpu';
-  const btn = document.getElementById('modeBtn');
-  btn.textContent = rpsState.mode==='pvcpu'?'🤖 vs CPU':'👥 PvP';
-  btn.classList.add('active');
-  document.getElementById('rpsChoicePanel').style.display = rpsState.mode==='pvcpu'?'grid':'none';
-  document.getElementById('pvpPanel').style.display = rpsState.mode==='pvp'?'block':'none';
-  document.getElementById('p2Label').textContent = rpsState.mode==='pvcpu'?'CPU':'Player 2';
-  document.getElementById('p1Label').textContent = rpsState.mode==='pvp'?'Player 1':'Bạn';
-  rpsReset();
-}
-function toggleSmart() {
-  rpsState.smart = !rpsState.smart;
-  document.getElementById('smartBtn').textContent = rpsState.smart?'🧠 Smart':'🎲 Random';
-  document.getElementById('smartBtn').classList.toggle('active',rpsState.smart);
-}
-
-function rpsPlay(choice) {
-  if (rpsState.gameOver) return;
-  const needed = Math.floor(rpsState.bestOf/2)+1;
-  rpsState.round++;
-  const cpuChoice = ai.choose(rpsState.smart);
-  ai.observe(choice);
-  const {outcome,reason} = getResult(choice, cpuChoice);
-  if (outcome==='W') rpsState.p1Wins++;
-  else if (outcome==='L') rpsState.p2Wins++;
-  rpsState.history.push({r:rpsState.round, p1:choice, p2:cpuChoice, outcome, reason});
-  renderArena(choice, cpuChoice, outcome, reason);
-  updateScore();
-  appendLog(rpsState.round, choice, cpuChoice, outcome, reason);
-  document.getElementById('aiInsight').textContent = ai.getInsight();
-  if (rpsState.p1Wins>=needed||rpsState.p2Wins>=needed) endGame();
-}
-
-function pvpSelect(player, choice) {
-  pvpChoices['p'+player] = choice;
-  document.getElementById('pvpStatus').textContent =
-    pvpChoices.p1&&pvpChoices.p2 ? 'Cả hai đã chọn! Tiết lộ...' :
-    `Player ${player} đã chọn bí mật. ${pvpChoices.p1?'Đang chờ Player 2.':'Đang chờ Player 1.'}`;
-  if (pvpChoices.p1 && pvpChoices.p2) {
-    setTimeout(()=>{
-      const {outcome,reason}=getResult(pvpChoices.p1,pvpChoices.p2);
-      rpsState.round++;
-      if(outcome==='W')rpsState.p1Wins++; else if(outcome==='L')rpsState.p2Wins++;
-      rpsState.history.push({r:rpsState.round,p1:pvpChoices.p1,p2:pvpChoices.p2,outcome,reason});
-      renderArena(pvpChoices.p1,pvpChoices.p2,outcome,reason,'Player 1','Player 2');
-      updateScore(); appendLog(rpsState.round,pvpChoices.p1,pvpChoices.p2,outcome,reason);
-      pvpChoices={p1:null,p2:null};
-      document.getElementById('pvpStatus').textContent='Cả hai cùng chọn bí mật.';
-      const needed=Math.floor(rpsState.bestOf/2)+1;
-      if(rpsState.p1Wins>=needed||rpsState.p2Wins>=needed) endGame();
-    }, 400);
-  }
-}
-
-function renderArena(c1, c2, outcome, reason, n1='Bạn', n2='CPU') {
-  const cls = outcome==='W'?'win':outcome==='L'?'lose':'draw';
-  const resultText = outcome==='W'?'🏆 Thắng!':outcome==='L'?'💀 Thua!':'🤝 Hòa!';
-  const needed=Math.floor(rpsState.bestOf/2)+1;
-  document.getElementById('rpsArena').innerHTML = `
-    <div class="choices-display">
-      <div class="choice-box ${cls}">
-        <span class="choice-emoji">${EMOJIS[c1]}</span>
-        <div class="choice-name">${n1}: ${NAMES[c1]}</div>
-      </div>
-      <div class="vs-badge">VS</div>
-      <div class="choice-box ${cls==='W'?'lose':cls==='L'?'win':'draw'}">
-        <span class="choice-emoji">${EMOJIS[c2]}</span>
-        <div class="choice-name">${n2}: ${NAMES[c2]}</div>
-      </div>
-    </div>
-    <div class="result-text ${cls}">${resultText}</div>
-    <div class="reason-text">${reason}</div>
-    <div style="font-size:11px;color:var(--text3);font-family:var(--mono);">Cần ${needed} thắng để thắng trận · BestOf ${rpsState.bestOf}</div>
-  `;
-}
-
-function updateScore() {
-  document.getElementById('scoreP1').textContent = rpsState.p1Wins;
-  document.getElementById('scoreP2').textContent = rpsState.p2Wins;
-  const needed=Math.floor(rpsState.bestOf/2)+1;
-  document.getElementById('roundInfo').innerHTML = `Vòng ${rpsState.round} · Cần <span id="neededWins">${needed}</span> thắng để thắng trận`;
-}
-
-function appendLog(r, c1, c2, outcome, reason) {
-  const el = document.getElementById('logEntries');
-  if (el.textContent === 'Chưa có ván nào.') el.innerHTML='';
-  const div = document.createElement('div');
-  div.className='log-entry';
-  div.innerHTML=`<span class="log-r">${r}</span><span class="log-outcome ${outcome}">${outcome==='W'?'WIN':outcome==='L'?'LOSE':'DRAW'}</span><span>${EMOJIS[c1]}${NAMES[c1]}</span><span style="color:var(--text3)">vs</span><span>${EMOJIS[c2]}${NAMES[c2]}</span><span style="color:var(--text3);flex:1;text-align:right;">${reason}</span>`;
-  el.prepend(div);
-}
-
-function endGame() {
-  rpsState.gameOver=true;
-  const needed=Math.floor(rpsState.bestOf/2)+1;
-  const won=rpsState.p1Wins>=needed;
-  const p2Label = rpsState.mode==='pvp'?'Player 2':'CPU';
-  document.getElementById('rpsArena').innerHTML+=`
-    <div style="margin-top:16px;padding:16px 24px;border-radius:var(--radius);background:${won?'rgba(46,204,113,0.08)':'rgba(231,76,60,0.08)'};border:1px solid ${won?'var(--green)':'var(--red)'};text-align:center;">
-      <div class="result-text ${won?'win':'lose'}" style="font-size:24px;">${won?'🏆 Thắng trận!':'💀 Thua trận!'}</div>
-      <div style="font-size:13px;color:var(--text2);margin-top:6px;">Tỉ số: ${rpsState.p1Wins} - ${rpsState.p2Wins} · BestOf ${rpsState.bestOf}</div>
-    </div>
-  `;
-  // Save to history
-  const rec = {
-    mode: rpsState.mode, bestOf: rpsState.bestOf,
-    p1: rpsState.p1Wins, p2: rpsState.p2Wins,
-    outcome: won?'W':'L', time: new Date().toISOString(),
-    rounds: rpsState.history.length
-  };
-  gameHistory.unshift(rec);
-  if (gameHistory.length>50) gameHistory.pop();
-  localStorage.setItem('kh-history', JSON.stringify(gameHistory));
-}
-
-function rpsReset() {
-  rpsState = { ...rpsState, p1Wins:0, p2Wins:0, round:0, gameOver:false, history:[] };
-  ai = new MarkovAI();
-  document.getElementById('scoreP1').textContent='0';
-  document.getElementById('scoreP2').textContent='0';
-  document.getElementById('roundInfo').innerHTML=`Vòng 1 · Cần <span id="neededWins">${Math.floor(rpsState.bestOf/2)+1}</span> thắng để thắng trận`;
-  document.getElementById('rpsArena').innerHTML='<div style="font-size:13px;color:var(--text2);">Chọn Kéo, Búa hoặc Bao để bắt đầu!</div>';
-  document.getElementById('logEntries').innerHTML='<div style="font-size:12px;color:var(--text3);font-family:var(--mono);">Chưa có ván nào.</div>';
-  document.getElementById('aiInsight').textContent='CPU chưa có dữ liệu. Hãy chơi vài ván để AI học pattern của bạn.';
-  pvpChoices={p1:null,p2:null};
-}
-
-// Keyboard shortcuts for RPS
-document.addEventListener('keydown', e => {
-  if (document.getElementById('page-rps').classList.contains('active') && rpsState.mode==='pvcpu') {
-    if (e.key==='1') rpsPlay(1);
-    if (e.key==='2') rpsPlay(2);
-    if (e.key==='3') rpsPlay(3);
-    if (e.key==='r'||e.key==='R') rpsReset();
-  }
-});
-
-// ── STATS ──
-function renderStats() {
-  gameHistory = JSON.parse(localStorage.getItem('kh-history')||'[]');
-  const total=gameHistory.length, wins=gameHistory.filter(r=>r.outcome==='W').length, losses=gameHistory.filter(r=>r.outcome==='L').length;
-  const wr = total?Math.round(wins/total*100):0;
-  document.getElementById('statsGrid').innerHTML=`
-    <div class="stat-card"><div class="stat-card-label">Tổng trận</div><div class="stat-card-val">${total}</div><div class="stat-card-sub">đã chơi</div></div>
-    <div class="stat-card"><div class="stat-card-label">Thắng</div><div class="stat-card-val" style="color:var(--green)">${wins}</div><div class="stat-card-sub">${wr}% win rate</div></div>
-    <div class="stat-card"><div class="stat-card-label">Thua</div><div class="stat-card-val" style="color:var(--red)">${losses}</div><div class="stat-card-sub">${total?Math.round(losses/total*100):0}%</div></div>
-    <div class="stat-card"><div class="stat-card-label">Hòa</div><div class="stat-card-val" style="color:var(--amber)">${total-wins-losses}</div><div class="stat-card-sub">trận</div></div>
-  `;
-  const tbody = document.getElementById('historyBody');
-  if (!gameHistory.length) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:32px;">Chưa có trận nào.</td></tr>'; return; }
-  tbody.innerHTML = gameHistory.map((r,i)=>`
-    <tr>
-      <td style="color:var(--text3);font-family:var(--mono);">${i+1}</td>
-      <td>${r.mode==='pvcpu'?'🤖 vs CPU':'👥 PvP'}</td>
-      <td style="font-family:var(--mono);">Best of ${r.bestOf}</td>
-      <td style="font-family:var(--mono);color:var(--accent3);">${r.p1}</td>
-      <td style="font-family:var(--mono);color:var(--red);">${r.p2}</td>
-      <td><span class="outcome-badge ${r.outcome}">${r.outcome==='W'?'Thắng':r.outcome==='L'?'Thua':'Hòa'}</span></td>
-      <td style="color:var(--text3);font-size:11px;font-family:var(--mono);">${new Date(r.time).toLocaleString('vi-VN')}</td>
-    </tr>
-  `).join('');
-}
-function clearHistory() {
-  if (confirm('Xóa toàn bộ lịch sử?')) {
-    gameHistory=[];
-    localStorage.removeItem('kh-history');
-    renderStats();
-  }
-}
-
-// ── ALGORITHM VISUALIZER ──
-let arr=[], steps=[], stepIdx=0, sorting=false, paused=false, sortTimeout=null;
-let comps=0, swaps=0, algoName='bubble', sortSpeed=100;
-const ALGOS = {
-  bubble:{name:'Bubble Sort',desc:'So sánh từng cặp phần tử liền kề, đổi chỗ nếu sai thứ tự. Lặp lại cho đến khi toàn bộ mảng được sắp xếp. Đơn giản nhưng kém hiệu quả.',best:'O(n)',avg:'O(n²)',worst:'O(n²)',space:'O(1)',stable:true},
-  insertion:{name:'Insertion Sort',desc:'Lấy từng phần tử và chèn vào đúng vị trí trong phần đã sắp xếp. Rất hiệu quả với mảng nhỏ hoặc gần như đã sắp xếp.',best:'O(n)',avg:'O(n²)',worst:'O(n²)',space:'O(1)',stable:true},
-  selection:{name:'Selection Sort',desc:'Tìm phần tử nhỏ nhất trong phần chưa sắp xếp và đặt vào đầu. Luôn O(n²) bất kể dữ liệu đầu vào.',best:'O(n²)',avg:'O(n²)',worst:'O(n²)',space:'O(1)',stable:false},
-  quick:{name:'Quick Sort',desc:'Chọn một pivot, phân hoạch mảng thành hai phần nhỏ hơn và lớn hơn pivot, rồi đệ quy sắp xếp từng phần. Trung bình rất nhanh.',best:'O(n log n)',avg:'O(n log n)',worst:'O(n²)',space:'O(log n)',stable:false},
-  merge:{name:'Merge Sort',desc:'Chia mảng thành hai nửa, sắp xếp từng nửa, rồi gộp lại. Luôn O(n log n) và ổn định, nhưng cần thêm O(n) bộ nhớ.',best:'O(n log n)',avg:'O(n log n)',worst:'O(n log n)',space:'O(n)',stable:true}
-};
-
-function initAlgo() { randomizeArray(); renderAlgoExplain(); }
-function setAlgo(name) {
-  algoName=name;
-  document.querySelectorAll('.algo-tab').forEach((t,i)=>{t.classList.toggle('active',[...document.querySelectorAll('.algo-tab')].indexOf(t)===['bubble','insertion','selection','quick','merge'].indexOf(name));});
-  document.querySelectorAll('.algo-tab').forEach(t=>{t.classList.remove('active');if(t.textContent.toLowerCase().includes(name.split('_').join(' ')))t.classList.add('active');if(name==='bubble'&&t.textContent==='Bubble Sort')t.classList.add('active');if(name==='insertion'&&t.textContent==='Insertion Sort')t.classList.add('active');if(name==='selection'&&t.textContent==='Selection Sort')t.classList.add('active');if(name==='quick'&&t.textContent==='Quick Sort')t.classList.add('active');if(name==='merge'&&t.textContent==='Merge Sort')t.classList.add('active');});
-  stopSort(); randomizeArray(); renderAlgoExplain();
-}
-function setSpeed(v) { sortSpeed=+v; }
-function randomizeArray() {
-  const n=+document.getElementById('sizeSlider')?.value||20;
-  arr=Array.from({length:n},()=>Math.floor(Math.random()*140)+20);
-  stopSort(); comps=0; swaps=0; updateStats(); renderBars();
-}
-function resizeArray(n) { document.getElementById('statSize').textContent=n; randomizeArray(); }
-function updateStats() { document.getElementById('statComp').textContent=comps; document.getElementById('statSwap').textContent=swaps; }
-
-function renderBars(highlights={}) {
-  const canvas=document.getElementById('algoCanvas'); if(!canvas) return;
-  const maxH=140, maxV=Math.max(...arr,1);
-  canvas.innerHTML=arr.map((v,i)=>{
-    const h=Math.round((v/maxV)*maxH);
-    const cls=highlights.sorted?.includes(i)?'sorted':highlights.pivot===i?'pivot':highlights.comparing?.includes(i)?'comparing':highlights.swapping?.includes(i)?'swapping':'';
-    return `<div class="bar ${cls}" style="height:${h}px;flex:1;max-width:32px;min-width:6px;" title="${v}"></div>`;
-  }).join('');
-}
-
-async function* bubbleSortGen(a) {
-  const n=a.length;
-  for(let i=0;i<n-1;i++){let sw=false;for(let j=0;j<n-i-1;j++){comps++;yield{comparing:[j,j+1]};if(a[j]>a[j+1]){[a[j],a[j+1]]=[a[j+1],a[j]];swaps++;sw=true;yield{swapping:[j,j+1]};}};if(!sw)break;}
-  yield{sorted:[...Array(n).keys()]};
-}
-async function* insertionSortGen(a) {
-  const n=a.length; yield{sorted:[0]};
-  for(let i=1;i<n;i++){let key=a[i],j=i-1;yield{comparing:[i,j]};while(j>=0&&a[j]>key){comps++;a[j+1]=a[j];swaps++;yield{swapping:[j,j+1]};j--;}a[j+1]=key;yield{sorted:[...Array(i+1).keys()]};}
-  yield{sorted:[...Array(n).keys()]};
-}
-async function* selectionSortGen(a) {
-  const n=a.length;
-  for(let i=0;i<n-1;i++){let mi=i;for(let j=i+1;j<n;j++){comps++;yield{comparing:[mi,j],sorted:[...Array(i).keys()]};if(a[j]<a[mi])mi=j;}if(mi!==i){[a[i],a[mi]]=[a[mi],a[i]];swaps++;yield{swapping:[i,mi],sorted:[...Array(i).keys()]};}}
-  yield{sorted:[...Array(n).keys()]};
-}
-async function* quickSortGen(a,lo=0,hi=a.length-1) {
-  if(lo<hi){let pivot=a[hi],pi=lo;yield{pivot:hi};for(let j=lo;j<hi;j++){comps++;yield{comparing:[j,hi],pivot:hi};if(a[j]<=pivot){[a[pi],a[j]]=[a[j],a[pi]];swaps++;yield{swapping:[pi,j],pivot:hi};pi++;}}[a[pi],a[hi]]=[a[hi],a[pi]];swaps++;yield{swapping:[pi,hi]};yield*quickSortGen(a,lo,pi-1);yield*quickSortGen(a,pi+1,hi);}
-}
-async function* mergeSortGen(a,l=0,r=a.length-1) {
-  if(l>=r) return;
-  const m=Math.floor((l+r)/2);
-  yield*mergeSortGen(a,l,m); yield*mergeSortGen(a,m+1,r);
-  const left=a.slice(l,m+1),right=a.slice(m+1,r+1);
-  let i=0,j=0,k=l;
-  while(i<left.length&&j<right.length){comps++;yield{comparing:[k,m+1+j]};if(left[i]<=right[j]){a[k++]=left[i++];}else{a[k++]=right[j++];swaps++;} }
-  while(i<left.length){a[k++]=left[i++];}
-  while(j<right.length){a[k++]=right[j++];}
-  yield{sorted:[...Array(r-l+1).keys()].map(x=>x+l)};
-}
-
-let genIterator=null;
-async function startSort() {
-  if (sorting&&!paused) return;
-  if (paused) { paused=false; document.getElementById('pauseBtn').disabled=false; document.getElementById('sortBtn').disabled=true; runStep(); return; }
-  sorting=true; paused=false;
-  document.getElementById('sortBtn').disabled=true;
-  document.getElementById('pauseBtn').disabled=false;
-  const a=[...arr]; comps=0; swaps=0;
-  const gens={bubble:bubbleSortGen,insertion:insertionSortGen,selection:selectionSortGen,quick:quickSortGen,merge:mergeSortGen};
-  genIterator = gens[algoName](a);
-  arr=a; runStep();
-}
-function runStep() {
-  if (!genIterator||paused) return;
-  const res=genIterator.next();
-  if (res.done) { sorting=false; paused=false; document.getElementById('sortBtn').disabled=false; document.getElementById('pauseBtn').disabled=true; renderBars({sorted:[...Array(arr.length).keys()]}); updateStats(); return; }
-  updateStats(); renderBars(res.value);
-  sortTimeout=setTimeout(runStep, sortSpeed);
-}
-function pauseSort() { paused=!paused; document.getElementById('pauseBtn').textContent=paused?'▶ Resume':'⏸ Pause'; if(!paused) runStep(); }
-function stopSort() { sorting=false; paused=false; clearTimeout(sortTimeout); genIterator=null; document.getElementById('sortBtn').disabled=false; document.getElementById('pauseBtn').disabled=true; document.getElementById('pauseBtn').textContent='⏸ Pause'; }
-function renderAlgoExplain() {
-  const a=ALGOS[algoName];
-  document.getElementById('algoExplain').innerHTML=`
-    <div class="explain-title">${a.name} — Cách hoạt động</div>
-    <div class="explain-body">${a.desc}</div>
-    <div class="complexity-row">
-      <span class="complex-chip">Best: <b>${a.best}</b></span>
-      <span class="complex-chip">Avg: <b>${a.avg}</b></span>
-      <span class="complex-chip">Worst: <b>${a.worst}</b></span>
-      <span class="complex-chip">Space: <b>${a.space}</b></span>
-      <span class="complex-chip">Stable: <b>${a.stable?'✓ Yes':'✗ No'}</b></span>
-    </div>
-  `;
-}
-
-// ── CODE DISPLAY ──
-const CODE_SAMPLES = {
-  cs: {
-    file: 'RockPaperScissors.cs',
-    code: `<span class="cmt">// ╔═══════════════════════════════════════╗
-// ║  Rock Paper Scissors — Refactored     ║
-// ║  Copyright © 2025 KhiemHuy           ║
-// ╚═══════════════════════════════════════╝</span>
-
-<span class="kw">using</span> System;
-<span class="kw">using</span> System.Collections.Generic;
-<span class="kw">using</span> System.Linq;
-
-<span class="kw">namespace</span> <span class="cls">KhiemHuy.GameArcade</span>
-{
-    <span class="cmt">// ── Enums ───────────────────────────────</span>
-    <span class="kw">public enum</span> <span class="cls">Choice</span> { Keo = <span class="num">1</span>, Bua = <span class="num">2</span>, Bao = <span class="num">3</span> }
-    <span class="kw">public enum</span> <span class="cls">Outcome</span> { Win, Lose, Draw }
-
-    <span class="cmt">// ── Value Objects ───────────────────────</span>
-    <span class="kw">public readonly record struct</span> <span class="cls">RoundResult</span>(
-        <span class="cls">Outcome</span> Outcome,
-        <span class="kw">string</span> Reason
-    );
-
-    <span class="cmt">// ── Rules Engine — O(1) lookup ──────────</span>
-    <span class="kw">public static class</span> <span class="cls">RulesEngine</span>
-    {
-        <span class="kw">private static readonly</span> <span class="cls">Dictionary</span>&lt;(<span class="cls">Choice</span>, <span class="cls">Choice</span>), <span class="cls">RoundResult</span>&gt; _wins
-            = <span class="kw">new</span>()
-            {
-                [(Choice.Keo, Choice.Bao)] = <span class="kw">new</span>(<span class="cls">Outcome</span>.Win,  <span class="str">"Kéo cắt Bao."</span>),
-                [(Choice.Bua, Choice.Keo)] = <span class="kw">new</span>(<span class="cls">Outcome</span>.Win,  <span class="str">"Búa đập Kéo."</span>),
-                [(Choice.Bao, Choice.Bua)] = <span class="kw">new</span>(<span class="cls">Outcome</span>.Win,  <span class="str">"Bao bọc Búa."</span>),
-            };
-
-        <span class="kw">public static</span> <span class="cls">RoundResult</span> <span class="fn">Evaluate</span>(<span class="cls">Choice</span> p1, <span class="cls">Choice</span> p2)
-        {
-            <span class="kw">if</span> (p1 == p2)
-                <span class="kw">return new</span>(<span class="cls">Outcome</span>.Draw, <span class="str">"Hòa — cùng lựa chọn."</span>);
-
-            <span class="kw">if</span> (_wins.<span class="fn">TryGetValue</span>((p1, p2), <span class="kw">out var</span> win))
-                <span class="kw">return</span> win;
-
-            <span class="kw">if</span> (_wins.<span class="fn">TryGetValue</span>((p2, p1), <span class="kw">out var</span> opp))
-                <span class="kw">return new</span>(<span class="cls">Outcome</span>.Lose, opp.Reason);
-
-            <span class="kw">throw new</span> <span class="cls">ArgumentException</span>(<span class="str">$"Invalid pair: {p1}, {p2}"</span>);
-        }
-    }
-
-    <span class="cmt">// ── Markov AI ───────────────────────────</span>
-    <span class="kw">public class</span> <span class="cls">MarkovAI</span>
-    {
-        <span class="kw">private readonly</span> <span class="cls">Dictionary</span>&lt;<span class="cls">Choice</span>, <span class="kw">int</span>&gt; _freq;
-        <span class="kw">private readonly</span> <span class="cls">Dictionary</span>&lt;<span class="cls">Choice</span>, <span class="cls">Dictionary</span>&lt;<span class="cls">Choice</span>, <span class="kw">int</span>&gt;&gt; _markov;
-        <span class="kw">private readonly</span> <span class="cls">List</span>&lt;<span class="cls">Choice</span>&gt; _history = [];
-        <span class="kw">private readonly</span> <span class="cls">Random</span> _rng = <span class="kw">new</span>();
-        <span class="kw">private const int</span> WindowSize = <span class="num">30</span>;
-
-        <span class="kw">public</span> <span class="fn">MarkovAI</span>()
-        {
-            <span class="kw">var</span> all = <span class="cls">Enum</span>.<span class="fn">GetValues</span>&lt;<span class="cls">Choice</span>&gt;();
-            _freq   = all.<span class="fn">ToDictionary</span>(c => c, _ => <span class="num">0</span>);
-            _markov = all.<span class="fn">ToDictionary</span>(c => c,
-                          _ => all.<span class="fn">ToDictionary</span>(c2 => c2, _ => <span class="num">0</span>));
-        }
-
-        <span class="kw">public void</span> <span class="fn">Observe</span>(<span class="cls">Choice</span> c)
-        {
-            _freq[c]++;
-            <span class="kw">if</span> (_history.<span class="fn">Count</span> > <span class="num">0</span>)
-                _markov[_history[^<span class="num">1</span>]][c]++;
-            _history.<span class="fn">Add</span>(c);
-            <span class="kw">if</span> (_history.<span class="fn">Count</span> > WindowSize)
-                _history.<span class="fn">RemoveAt</span>(<span class="num">0</span>);
-        }
-
-        <span class="kw">public</span> <span class="cls">Choice</span> <span class="fn">Predict</span>(<span class="kw">bool</span> smart = <span class="kw">true</span>)
-        {
-            <span class="kw">if</span> (!smart || _history.<span class="fn">Count</span> < <span class="num">2</span>)
-                <span class="kw">return</span> (<span class="cls">Choice</span>)_rng.<span class="fn">Next</span>(<span class="num">1</span>, <span class="num">4</span>);
-
-            <span class="cmt">// 1. 3-gram pattern detection</span>
-            <span class="kw">if</span> (_history.<span class="fn">Count</span> >= <span class="num">3</span> &&
-                <span class="fn">TryPattern</span>(_history[^<span class="num">3</span>], _history[^<span class="num">2</span>], _history[^<span class="num">1</span>],
-                              <span class="kw">out var</span> patternPred))
-                <span class="kw">return</span> _rng.<span class="fn">Next</span>(<span class="num">100</span>) < <span class="num">80</span>
-                    ? <span class="fn">CounterOf</span>(patternPred) : (<span class="cls">Choice</span>)_rng.<span class="fn">Next</span>(<span class="num">1</span>, <span class="num">4</span>);
-
-            <span class="cmt">// 2. Markov transition</span>
-            <span class="kw">var</span> markovPred = <span class="fn">MostLikely</span>(_markov[_history[^<span class="num">1</span>]]);
-            <span class="kw">if</span> (markovPred.HasValue)
-                <span class="kw">return</span> _rng.<span class="fn">Next</span>(<span class="num">100</span>) < <span class="num">70</span>
-                    ? <span class="fn">CounterOf</span>(markovPred.Value) : (<span class="cls">Choice</span>)_rng.<span class="fn">Next</span>(<span class="num">1</span>, <span class="num">4</span>);
-
-            <span class="cmt">// 3. Frequency fallback</span>
-            <span class="kw">var</span> freqPred = _freq.<span class="fn">MaxBy</span>(kv => kv.Value).Key;
-            <span class="kw">return</span> _rng.<span class="fn">Next</span>(<span class="num">100</span>) < <span class="num">60</span>
-                ? <span class="fn">CounterOf</span>(freqPred) : (<span class="cls">Choice</span>)_rng.<span class="fn">Next</span>(<span class="num">1</span>, <span class="num">4</span>);
-        }
-
-        <span class="kw">private static</span> <span class="cls">Choice</span> <span class="fn">CounterOf</span>(<span class="cls">Choice</span> c) => c <span class="kw">switch</span>
-        {
-            <span class="cls">Choice</span>.Keo => <span class="cls">Choice</span>.Bua,
-            <span class="cls">Choice</span>.Bua => <span class="cls">Choice</span>.Bao,
-            <span class="cls">Choice</span>.Bao => <span class="cls">Choice</span>.Keo,
-            _ => <span class="kw">throw new</span> <span class="cls">ArgumentOutOfRangeException</span>()
-        };
-
-        <span class="kw">private bool</span> <span class="fn">TryPattern</span>(<span class="cls">Choice</span> a, <span class="cls">Choice</span> b, <span class="cls">Choice</span> c, <span class="kw">out</span> <span class="cls">Choice</span> next)
-        {
-            <span class="kw">var</span> counts = <span class="cls">Enum</span>.<span class="fn">GetValues</span>&lt;<span class="cls">Choice</span>&gt;()
-                .<span class="fn">ToDictionary</span>(ch => ch, _ => <span class="num">0</span>);
-            <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i + <span class="num">3</span> < _history.<span class="fn">Count</span>; i++)
-                <span class="kw">if</span> (_history[i]==a && _history[i+<span class="num">1</span>]==b && _history[i+<span class="num">2</span>]==c)
-                    counts[_history[i+<span class="num">3</span>]]++;
-            <span class="kw">if</span> (counts.<span class="fn">Values</span>.<span class="fn">Sum</span>() == <span class="num">0</span>) { next = <span class="kw">default</span>; <span class="kw">return false</span>; }
-            next = counts.<span class="fn">MaxBy</span>(kv => kv.Value).Key;
-            <span class="kw">return true</span>;
-        }
-
-        <span class="kw">private static</span> <span class="cls">Choice</span>? <span class="fn">MostLikely</span>(<span class="cls">Dictionary</span>&lt;<span class="cls">Choice</span>, <span class="kw">int</span>&gt; row)
-            => row.<span class="fn">Values</span>.<span class="fn">Sum</span>() > <span class="num">0</span>
-               ? row.<span class="fn">MaxBy</span>(kv => kv.Value).Key
-               : <span class="kw">null</span>;
-    }
-}`
-  },
-  js: {
-    file: 'RockPaperScissors.js',
-    code: `<span class="cmt">// ╔═══════════════════════════════════════╗
-// ║  Rock Paper Scissors — JavaScript     ║
-// ║  Copyright © 2025 KhiemHuy           ║
-// ╚═══════════════════════════════════════╝</span>
-
-<span class="cmt">/** @enum {number} */</span>
-<span class="kw">const</span> Choice = <span class="cls">Object</span>.<span class="fn">freeze</span>({ Keo: <span class="num">1</span>, Bua: <span class="num">2</span>, Bao: <span class="num">3</span> });
-
-<span class="cmt">// ── Rules Engine ────────────────────────</span>
-<span class="kw">class</span> <span class="cls">RulesEngine</span> {
-  <span class="kw">static</span> #wins = <span class="kw">new</span> <span class="cls">Map</span>([
-    [<span class="str">\`\${Choice.Keo}-\${Choice.Bao}\`</span>, { outcome: <span class="str">'W'</span>, reason: <span class="str">'Kéo cắt Bao.'</span> }],
-    [<span class="str">\`\${Choice.Bua}-\${Choice.Keo}\`</span>, { outcome: <span class="str">'W'</span>, reason: <span class="str">'Búa đập Kéo.'</span> }],
-    [<span class="str">\`\${Choice.Bao}-\${Choice.Bua}\`</span>, { outcome: <span class="str">'W'</span>, reason: <span class="str">'Bao bọc Búa.'</span> }],
-  ]);
-
-  <span class="kw">static</span> <span class="fn">evaluate</span>(p1, p2) {
-    <span class="kw">if</span> (p1 === p2) <span class="kw">return</span> { outcome: <span class="str">'D'</span>, reason: <span class="str">'Hòa — cùng lựa chọn.'</span> };
-    <span class="kw">const</span> key = <span class="str">\`\${p1}-\${p2}\`</span>;
-    <span class="kw">if</span> (<span class="cls">RulesEngine</span>.#wins.<span class="fn">has</span>(key)) <span class="kw">return</span> <span class="cls">RulesEngine</span>.#wins.<span class="fn">get</span>(key);
-    <span class="kw">const</span> opp = <span class="cls">RulesEngine</span>.#wins.<span class="fn">get</span>(<span class="str">\`\${p2}-\${p1}\`</span>);
-    <span class="kw">return</span> { outcome: <span class="str">'L'</span>, reason: opp.reason };
-  }
-}
-
-<span class="cmt">// ── Markov AI ───────────────────────────</span>
-<span class="kw">class</span> <span class="cls">MarkovAI</span> {
-  #freq    = { [Choice.Keo]: <span class="num">0</span>, [Choice.Bua]: <span class="num">0</span>, [Choice.Bao]: <span class="num">0</span> };
-  #markov  = {
-    [Choice.Keo]: { [Choice.Keo]: <span class="num">0</span>, [Choice.Bua]: <span class="num">0</span>, [Choice.Bao]: <span class="num">0</span> },
-    [Choice.Bua]: { [Choice.Keo]: <span class="num">0</span>, [Choice.Bua]: <span class="num">0</span>, [Choice.Bao]: <span class="num">0</span> },
-    [Choice.Bao]: { [Choice.Keo]: <span class="num">0</span>, [Choice.Bua]: <span class="num">0</span>, [Choice.Bao]: <span class="num">0</span> },
-  };
-  #history = [];
-  #WINDOW  = <span class="num">30</span>;
-
-  <span class="fn">observe</span>(choice) {
-    <span class="kw">this</span>.#freq[choice]++;
-    <span class="kw">if</span> (<span class="kw">this</span>.#history.<span class="fn">length</span> > <span class="num">0</span>)
-      <span class="kw">this</span>.#markov[<span class="kw">this</span>.#history.<span class="fn">at</span>(-<span class="num">1</span>)][choice]++;
-    <span class="kw">this</span>.#history.<span class="fn">push</span>(choice);
-    <span class="kw">if</span> (<span class="kw">this</span>.#history.<span class="fn">length</span> > <span class="kw">this</span>.#WINDOW)
-      <span class="kw">this</span>.#history.<span class="fn">shift</span>();
-  }
-
-  <span class="fn">predict</span>(smart = <span class="kw">true</span>) {
-    <span class="kw">if</span> (!smart || <span class="kw">this</span>.#history.<span class="fn">length</span> < <span class="num">2</span>) <span class="kw">return</span> <span class="kw">this</span>.#rand();
-    <span class="kw">const</span> h = <span class="kw">this</span>.#history;
-
-    <span class="cmt">// 1. 3-gram pattern</span>
-    <span class="kw">if</span> (h.<span class="fn">length</span> >= <span class="num">3</span>) {
-      <span class="kw">const</span> pred = <span class="kw">this</span>.#patternPredict(h.<span class="fn">at</span>(-<span class="num">3</span>), h.<span class="fn">at</span>(-<span class="num">2</span>), h.<span class="fn">at</span>(-<span class="num">1</span>));
-      <span class="kw">if</span> (pred !== <span class="kw">null</span>) <span class="kw">return</span> <span class="cls">Math</span>.<span class="fn">random</span>() < <span class="num">0.8</span> ? <span class="kw">this</span>.#counter(pred) : <span class="kw">this</span>.#rand();
-    }
-
-    <span class="cmt">// 2. Markov</span>
-    <span class="kw">const</span> mpred = <span class="kw">this</span>.#mostLikely(<span class="kw">this</span>.#markov[h.<span class="fn">at</span>(-<span class="num">1</span>)]);
-    <span class="kw">if</span> (mpred) <span class="kw">return</span> <span class="cls">Math</span>.<span class="fn">random</span>() < <span class="num">0.7</span> ? <span class="kw">this</span>.#counter(mpred) : <span class="kw">this</span>.#rand();
-
-    <span class="cmt">// 3. Frequency fallback</span>
-    <span class="kw">const</span> fpred = <span class="kw">this</span>.#mostLikely(<span class="kw">this</span>.#freq);
-    <span class="kw">return</span> <span class="cls">Math</span>.<span class="fn">random</span>() < <span class="num">0.6</span> ? <span class="kw">this</span>.#counter(fpred) : <span class="kw">this</span>.#rand();
-  }
-
-  #counter(c) { <span class="kw">return</span> c === Choice.Keo ? Choice.Bua : c === Choice.Bua ? Choice.Bao : Choice.Keo; }
-  #rand()     { <span class="kw">return</span> <span class="cls">Math</span>.<span class="fn">ceil</span>(<span class="cls">Math</span>.<span class="fn">random</span>() * <span class="num">3</span>); }
-  #mostLikely(map) {
-    <span class="kw">const</span> total = <span class="cls">Object</span>.<span class="fn">values</span>(map).<span class="fn">reduce</span>((a, b) => a + b, <span class="num">0</span>);
-    <span class="kw">if</span> (!total) <span class="kw">return null</span>;
-    <span class="kw">return</span> +<span class="cls">Object</span>.<span class="fn">entries</span>(map).<span class="fn">sort</span>((a, b) => b[<span class="num">1</span>] - a[<span class="num">1</span>])[<span class="num">0</span>][<span class="num">0</span>];
-  }
-  #patternPredict(a, b, c) {
-    <span class="kw">const</span> nc = { [Choice.Keo]: <span class="num">0</span>, [Choice.Bua]: <span class="num">0</span>, [Choice.Bao]: <span class="num">0</span> };
-    <span class="kw">const</span> h = <span class="kw">this</span>.#history;
-    <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i + <span class="num">3</span> < h.<span class="fn">length</span>; i++)
-      <span class="kw">if</span> (h[i]===a && h[i+<span class="num">1</span>]===b && h[i+<span class="num">2</span>]===c) nc[h[i+<span class="num">3</span>]]++;
-    <span class="kw">return</span> <span class="cls">Object</span>.<span class="fn">values</span>(nc).<span class="fn">reduce</span>((a,b)=>a+b,<span class="num">0</span>) > <span class="num">0</span> ? <span class="kw">this</span>.#mostLikely(nc) : <span class="kw">null</span>;
-  }
-}`
-  },
-  py: {
-    file: 'rock_paper_scissors.py',
-    code: `<span class="cmt"># ╔═══════════════════════════════════════╗
-# ║  Rock Paper Scissors — Python         ║
-# ║  Copyright © 2025 KhiemHuy           ║
-# ╚═══════════════════════════════════════╝</span>
-
-<span class="kw">from</span> <span class="cls">enum</span> <span class="kw">import</span> IntEnum
-<span class="kw">from</span> <span class="cls">collections</span> <span class="kw">import</span> defaultdict, deque
-<span class="kw">from</span> <span class="cls">dataclasses</span> <span class="kw">import</span> dataclass
-<span class="kw">from</span> <span class="cls">typing</span> <span class="kw">import</span> Optional
-<span class="kw">import</span> random
-
-
-<span class="kw">class</span> <span class="cls">Choice</span>(IntEnum):
-    KEO = <span class="num">1</span>
-    BUA = <span class="num">2</span>
-    BAO = <span class="num">3</span>
-
-
-<span class="kw">class</span> <span class="cls">Outcome</span>(IntEnum):
-    WIN  = <span class="num">1</span>
-    LOSE = <span class="num">-1</span>
-    DRAW = <span class="num">0</span>
-
-
-<span class="op">@</span>dataclass(frozen=<span class="kw">True</span>)
-<span class="kw">class</span> <span class="cls">RoundResult</span>:
-    outcome: <span class="cls">Outcome</span>
-    reason:  <span class="kw">str</span>
-
-
-<span class="cmt"># ── Rules Engine ────────────────────────</span>
-<span class="kw">class</span> <span class="cls">RulesEngine</span>:
-    _WINS: <span class="kw">dict</span>[<span class="kw">tuple</span>, <span class="cls">RoundResult</span>] = {
-        (<span class="cls">Choice</span>.KEO, <span class="cls">Choice</span>.BAO): <span class="cls">RoundResult</span>(<span class="cls">Outcome</span>.WIN,  <span class="str">"Kéo cắt Bao."</span>),
-        (<span class="cls">Choice</span>.BUA, <span class="cls">Choice</span>.KEO): <span class="cls">RoundResult</span>(<span class="cls">Outcome</span>.WIN,  <span class="str">"Búa đập Kéo."</span>),
-        (<span class="cls">Choice</span>.BAO, <span class="cls">Choice</span>.BUA): <span class="cls">RoundResult</span>(<span class="cls">Outcome</span>.WIN,  <span class="str">"Bao bọc Búa."</span>),
-    }
-
-    <span class="op">@classmethod</span>
-    <span class="kw">def</span> <span class="fn">evaluate</span>(cls, p1: <span class="cls">Choice</span>, p2: <span class="cls">Choice</span>) -> <span class="cls">RoundResult</span>:
-        <span class="kw">if</span> p1 == p2:
-            <span class="kw">return</span> <span class="cls">RoundResult</span>(<span class="cls">Outcome</span>.DRAW, <span class="str">"Hòa — cùng lựa chọn."</span>)
-        <span class="kw">if</span> (p1, p2) <span class="kw">in</span> cls._WINS:
-            <span class="kw">return</span> cls._WINS[(p1, p2)]
-        opp = cls._WINS[(p2, p1)]
-        <span class="kw">return</span> <span class="cls">RoundResult</span>(<span class="cls">Outcome</span>.LOSE, opp.reason)
-
-
-<span class="cmt"># ── Markov AI ───────────────────────────</span>
-<span class="kw">class</span> <span class="cls">MarkovAI</span>:
-    WINDOW = <span class="num">30</span>
-
-    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>):
-        <span class="kw">self</span>.freq    = defaultdict(<span class="kw">int</span>)
-        <span class="kw">self</span>.markov  = {c: defaultdict(<span class="kw">int</span>) <span class="kw">for</span> c <span class="kw">in</span> <span class="cls">Choice</span>}
-        <span class="kw">self</span>.history: deque[<span class="cls">Choice</span>] = deque(maxlen=<span class="kw">self</span>.WINDOW)
-
-    <span class="kw">def</span> <span class="fn">observe</span>(<span class="kw">self</span>, c: <span class="cls">Choice</span>) -> <span class="kw">None</span>:
-        <span class="kw">if</span> <span class="kw">self</span>.history:
-            <span class="kw">self</span>.markov[<span class="kw">self</span>.history[-<span class="num">1</span>]][c] += <span class="num">1</span>
-        <span class="kw">self</span>.freq[c] += <span class="num">1</span>
-        <span class="kw">self</span>.history.<span class="fn">append</span>(c)
-
-    <span class="kw">def</span> <span class="fn">predict</span>(<span class="kw">self</span>, smart: <span class="kw">bool</span> = <span class="kw">True</span>) -> <span class="cls">Choice</span>:
-        <span class="kw">if</span> <span class="kw">not</span> smart <span class="kw">or</span> <span class="fn">len</span>(<span class="kw">self</span>.history) < <span class="num">2</span>:
-            <span class="kw">return</span> random.<span class="fn">choice</span>(<span class="fn">list</span>(<span class="cls">Choice</span>))
-        h = <span class="fn">list</span>(<span class="kw">self</span>.history)
-
-        <span class="cmt"># 1. 3-gram pattern detection</span>
-        <span class="kw">if</span> <span class="fn">len</span>(h) >= <span class="num">3</span>:
-            pred = <span class="kw">self</span>._pattern_predict(*h[-<span class="num">3</span>:])
-            <span class="kw">if</span> pred <span class="kw">is not None</span>:
-                <span class="kw">return</span> <span class="kw">self</span>._counter(pred) <span class="kw">if</span> random.<span class="fn">random</span>() < <span class="num">0.8</span> <span class="kw">else</span> random.<span class="fn">choice</span>(<span class="fn">list</span>(<span class="cls">Choice</span>))
-
-        <span class="cmt"># 2. Markov chain</span>
-        mpred = <span class="kw">self</span>._most_likely(<span class="kw">self</span>.markov[h[-<span class="num">1</span>]])
-        <span class="kw">if</span> mpred:
-            <span class="kw">return</span> <span class="kw">self</span>._counter(mpred) <span class="kw">if</span> random.<span class="fn">random</span>() < <span class="num">0.7</span> <span class="kw">else</span> random.<span class="fn">choice</span>(<span class="fn">list</span>(<span class="cls">Choice</span>))
-
-        <span class="cmt"># 3. Frequency fallback</span>
-        fpred = <span class="kw">self</span>._most_likely(<span class="kw">self</span>.freq)
-        <span class="kw">return</span> <span class="kw">self</span>._counter(fpred) <span class="kw">if</span> fpred <span class="kw">and</span> random.<span class="fn">random</span>() < <span class="num">0.6</span> <span class="kw">else</span> random.<span class="fn">choice</span>(<span class="fn">list</span>(<span class="cls">Choice</span>))
-
-    <span class="kw">def</span> <span class="fn">_counter</span>(<span class="kw">self</span>, c: <span class="cls">Choice</span>) -> <span class="cls">Choice</span>:
-        <span class="kw">return</span> {<span class="cls">Choice</span>.KEO: <span class="cls">Choice</span>.BUA, <span class="cls">Choice</span>.BUA: <span class="cls">Choice</span>.BAO, <span class="cls">Choice</span>.BAO: <span class="cls">Choice</span>.KEO}[c]
-
-    <span class="kw">def</span> <span class="fn">_most_likely</span>(<span class="kw">self</span>, d) -> <span class="cls">Optional</span>[<span class="cls">Choice</span>]:
-        <span class="kw">return</span> <span class="fn">max</span>(d, key=d.<span class="fn">get</span>) <span class="kw">if</span> <span class="fn">any</span>(d.<span class="fn">values</span>()) <span class="kw">else None</span>
-
-    <span class="kw">def</span> <span class="fn">_pattern_predict</span>(<span class="kw">self</span>, a, b, c) -> <span class="cls">Optional</span>[<span class="cls">Choice</span>]:
-        nc = defaultdict(<span class="kw">int</span>)
-        h = <span class="fn">list</span>(<span class="kw">self</span>.history)
-        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(h) - <span class="num">3</span>):
-            <span class="kw">if</span> h[i]==a <span class="kw">and</span> h[i+<span class="num">1</span>]==b <span class="kw">and</span> h[i+<span class="num">2</span>]==c:
-                nc[h[i+<span class="num">3</span>]] += <span class="num">1</span>
-        <span class="kw">return</span> <span class="fn">max</span>(nc, key=nc.<span class="fn">get</span>) <span class="kw">if</span> nc <span class="kw">else None</span>`
-  },
-  java: {
-    file: 'RockPaperScissors.java',
-    code: `<span class="cmt">// ╔═══════════════════════════════════════╗
-// ║  Rock Paper Scissors — Java           ║
-// ║  Copyright © 2025 KhiemHuy           ║
-// ╚═══════════════════════════════════════╝</span>
-
-<span class="kw">package</span> khiemhuy.arcade;
-
-<span class="kw">import</span> java.util.*;
-<span class="kw">import</span> java.util.stream.*;
-
-<span class="kw">public class</span> <span class="cls">RockPaperScissors</span> {
-
-    <span class="cmt">// ── Enums ─────────────────────────────</span>
-    <span class="kw">public enum</span> <span class="cls">Choice</span> { KEO, BUA, BAO }
-    <span class="kw">public enum</span> <span class="cls">Outcome</span> { WIN, LOSE, DRAW }
-
-    <span class="kw">public record</span> <span class="cls">RoundResult</span>(<span class="cls">Outcome</span> outcome, <span class="cls">String</span> reason) {}
-
-    <span class="cmt">// ── Rules Engine ──────────────────────</span>
-    <span class="kw">public static class</span> <span class="cls">RulesEngine</span> {
-        <span class="kw">private static final</span> <span class="cls">Map</span>&lt;<span class="cls">String</span>, <span class="cls">RoundResult</span>&gt; WINS = <span class="cls">Map</span>.<span class="fn">of</span>(
-            key(<span class="cls">Choice</span>.KEO, <span class="cls">Choice</span>.BAO), <span class="kw">new</span> <span class="cls">RoundResult</span>(<span class="cls">Outcome</span>.WIN,  <span class="str">"Kéo cắt Bao."</span>),
-            key(<span class="cls">Choice</span>.BUA, <span class="cls">Choice</span>.KEO), <span class="kw">new</span> <span class="cls">RoundResult</span>(<span class="cls">Outcome</span>.WIN,  <span class="str">"Búa đập Kéo."</span>),
-            key(<span class="cls">Choice</span>.BAO, <span class="cls">Choice</span>.BUA), <span class="kw">new</span> <span class="cls">RoundResult</span>(<span class="cls">Outcome</span>.WIN,  <span class="str">"Bao bọc Búa."</span>)
-        );
-
-        <span class="kw">private static</span> <span class="cls">String</span> <span class="fn">key</span>(<span class="cls">Choice</span> a, <span class="cls">Choice</span> b) {
-            <span class="kw">return</span> a + <span class="str">"-"</span> + b;
-        }
-
-        <span class="kw">public static</span> <span class="cls">RoundResult</span> <span class="fn">evaluate</span>(<span class="cls">Choice</span> p1, <span class="cls">Choice</span> p2) {
-            <span class="kw">if</span> (p1 == p2) <span class="kw">return new</span> <span class="cls">RoundResult</span>(<span class="cls">Outcome</span>.DRAW, <span class="str">"Hòa — cùng lựa chọn."</span>);
-            <span class="kw">var</span> win = WINS.<span class="fn">get</span>(<span class="fn">key</span>(p1, p2));
-            <span class="kw">if</span> (win != <span class="kw">null</span>) <span class="kw">return</span> win;
-            <span class="kw">var</span> opp = WINS.<span class="fn">get</span>(<span class="fn">key</span>(p2, p1));
-            <span class="kw">return new</span> <span class="cls">RoundResult</span>(<span class="cls">Outcome</span>.LOSE, opp.reason());
-        }
-    }
-
-    <span class="cmt">// ── Markov AI ─────────────────────────</span>
-    <span class="kw">public static class</span> <span class="cls">MarkovAI</span> {
-        <span class="kw">private static final int</span> WINDOW = <span class="num">30</span>;
-        <span class="kw">private final</span> <span class="cls">Map</span>&lt;<span class="cls">Choice</span>, <span class="cls">Integer</span>&gt; freq   = <span class="kw">new</span> <span class="cls">EnumMap</span>&lt;&gt;(<span class="cls">Choice</span>.<span class="kw">class</span>);
-        <span class="kw">private final</span> <span class="cls">Map</span>&lt;<span class="cls">Choice</span>, <span class="cls">Map</span>&lt;<span class="cls">Choice</span>, <span class="cls">Integer</span>&gt;&gt; markov = <span class="kw">new</span> <span class="cls">EnumMap</span>&lt;&gt;(<span class="cls">Choice</span>.<span class="kw">class</span>);
-        <span class="kw">private final</span> <span class="cls">Deque</span>&lt;<span class="cls">Choice</span>&gt; history = <span class="kw">new</span> <span class="cls">ArrayDeque</span>&lt;&gt;();
-        <span class="kw">private final</span> <span class="cls">Random</span> rng = <span class="kw">new</span> <span class="cls">Random</span>();
-
-        <span class="kw">public</span> <span class="fn">MarkovAI</span>() {
-            <span class="kw">for</span> (<span class="kw">var</span> c : <span class="cls">Choice</span>.<span class="fn">values</span>()) {
-                freq.<span class="fn">put</span>(c, <span class="num">0</span>);
-                markov.<span class="fn">put</span>(c, <span class="kw">new</span> <span class="cls">EnumMap</span>&lt;&gt;(<span class="cls">Choice</span>.<span class="kw">class</span>));
-                <span class="kw">for</span> (<span class="kw">var</span> c2 : <span class="cls">Choice</span>.<span class="fn">values</span>()) markov.<span class="fn">get</span>(c).<span class="fn">put</span>(c2, <span class="num">0</span>);
-            }
-        }
-
-        <span class="kw">public void</span> <span class="fn">observe</span>(<span class="cls">Choice</span> c) {
-            freq.<span class="fn">merge</span>(c, <span class="num">1</span>, <span class="cls">Integer</span>::sum);
-            <span class="kw">if</span> (!history.<span class="fn">isEmpty</span>())
-                markov.<span class="fn">get</span>(history.<span class="fn">peekLast</span>()).<span class="fn">merge</span>(c, <span class="num">1</span>, <span class="cls">Integer</span>::sum);
-            history.<span class="fn">addLast</span>(c);
-            <span class="kw">if</span> (history.<span class="fn">size</span>() > WINDOW) history.<span class="fn">pollFirst</span>();
-        }
-
-        <span class="kw">public</span> <span class="cls">Choice</span> <span class="fn">predict</span>(<span class="kw">boolean</span> smart) {
-            <span class="cls">Choice</span>[] all = <span class="cls">Choice</span>.<span class="fn">values</span>();
-            <span class="kw">if</span> (!smart || history.<span class="fn">size</span>() < <span class="num">2</span>) <span class="kw">return</span> all[rng.<span class="fn">nextInt</span>(all.length)];
-            <span class="kw">var</span> hist = <span class="kw">new</span> <span class="cls">ArrayList</span>&lt;&gt;(history);
-
-            <span class="cmt">// 1. Pattern detection</span>
-            <span class="kw">if</span> (hist.<span class="fn">size</span>() >= <span class="num">3</span>) {
-                <span class="kw">var</span> pred = <span class="fn">patternPredict</span>(hist.<span class="fn">get</span>(hist.<span class="fn">size</span>()-<span class="num">3</span>),
-                                            hist.<span class="fn">get</span>(hist.<span class="fn">size</span>()-<span class="num">2</span>),
-                                            hist.<span class="fn">get</span>(hist.<span class="fn">size</span>()-<span class="num">1</span>));
-                <span class="kw">if</span> (pred != <span class="kw">null</span>)
-                    <span class="kw">return</span> rng.<span class="fn">nextInt</span>(<span class="num">100</span>) < <span class="num">80</span> ? <span class="fn">counter</span>(pred) : all[rng.<span class="fn">nextInt</span>(all.length)];
-            }
-
-            <span class="cmt">// 2. Markov</span>
-            <span class="kw">var</span> mpred = <span class="fn">mostLikely</span>(markov.<span class="fn">get</span>(hist.<span class="fn">get</span>(hist.<span class="fn">size</span>()-<span class="num">1</span>)));
-            <span class="kw">if</span> (mpred != <span class="kw">null</span>)
-                <span class="kw">return</span> rng.<span class="fn">nextInt</span>(<span class="num">100</span>) < <span class="num">70</span> ? <span class="fn">counter</span>(mpred) : all[rng.<span class="fn">nextInt</span>(all.length)];
-
-            <span class="cmt">// 3. Frequency fallback</span>
-            <span class="kw">var</span> fpred = <span class="fn">mostLikely</span>(freq);
-            <span class="kw">return</span> fpred != <span class="kw">null</span> && rng.<span class="fn">nextInt</span>(<span class="num">100</span>) < <span class="num">60</span>
-                ? <span class="fn">counter</span>(fpred) : all[rng.<span class="fn">nextInt</span>(all.length)];
-        }
-
-        <span class="kw">private</span> <span class="cls">Choice</span> <span class="fn">counter</span>(<span class="cls">Choice</span> c) {
-            <span class="kw">return switch</span> (c) {
-                <span class="kw">case</span> KEO -> <span class="cls">Choice</span>.BUA;
-                <span class="kw">case</span> BUA -> <span class="cls">Choice</span>.BAO;
-                <span class="kw">case</span> BAO -> <span class="cls">Choice</span>.KEO;
-            };
-        }
-
-        <span class="kw">private</span> <span class="cls">Choice</span> <span class="fn">mostLikely</span>(<span class="cls">Map</span>&lt;<span class="cls">Choice</span>, <span class="cls">Integer</span>&gt; m) {
-            <span class="kw">return</span> m.<span class="fn">entrySet</span>().<span class="fn">stream</span>()
-                .<span class="fn">filter</span>(e -> e.<span class="fn">getValue</span>() > <span class="num">0</span>)
-                .<span class="fn">max</span>(<span class="cls">Map</span>.<span class="cls">Entry</span>.<span class="fn">comparingByValue</span>())
-                .<span class="fn">map</span>(<span class="cls">Map</span>.<span class="cls">Entry</span>::<span class="fn">getKey</span>)
-                .<span class="fn">orElse</span>(<span class="kw">null</span>);
-        }
-    }
-}`
-  }
-};
-
-let currentLang = 'cs';
-function initCode() { showCode('cs'); }
-function showCode(lang) {
-  currentLang=lang;
-  document.querySelectorAll('#page-code .algo-tab').forEach((t,i)=>{
-    t.classList.toggle('active',['cs','js','py','java'][i]===lang);
-  });
-  const s=CODE_SAMPLES[lang];
-  document.getElementById('codeFileName').textContent=s.file;
-  document.getElementById('codeDisplay').innerHTML=s.code;
-}
-function copyCode() {
-  const txt=document.getElementById('codeDisplay').textContent;
-  navigator.clipboard.writeText(txt).then(()=>{
-    const btn=document.querySelector('#page-code .ctrl-btn');
-    const orig=btn.textContent; btn.textContent='✓ Copied!';
-    setTimeout(()=>btn.textContent=orig,1500);
-  });
-}
-
-// ── CONVERTER ──
-const SAMPLE_CODE = `public RoundResult GetResult(Choice p1, Choice p2)
-{
-    if (p1 == p2)
-        return new RoundResult(Outcome.Draw, "Hòa — cùng lựa chọn.");
-
-    if (_wins.TryGetValue((p1, p2), out var win))
-        return win;
-
-    if (_wins.TryGetValue((p2, p1), out var opp))
-        return new RoundResult(Outcome.Lose, opp.Reason);
-
-    throw new ArgumentException($"Invalid pair: {p1}, {p2}");
-}`;
-
-function loadSampleCode() { document.getElementById('convInput').value=SAMPLE_CODE; }
-function copyConvOutput() {
-  const txt=document.getElementById('convOutput').value;
-  if(!txt) return;
-  navigator.clipboard.writeText(txt);
-  document.getElementById('convStatus').textContent='✓ Đã copy!';
-  setTimeout(()=>document.getElementById('convStatus').textContent='',2000);
-}
-
-async function runConvert() {
-  const code=document.getElementById('convInput').value.trim();
-  if(!code){document.getElementById('convStatus').textContent='⚠ Vui lòng nhập code';return;}
-  const fromLang=document.getElementById('fromLang').value;
-  const toLang=document.getElementById('toLang').value;
-  if(fromLang===toLang){document.getElementById('convStatus').textContent='⚠ Ngôn ngữ nguồn và đích giống nhau';return;}
-  const langNames={csharp:'C#',javascript:'JavaScript',python:'Python',java:'Java'};
-  document.getElementById('convOutput').value='// Đang chuyển đổi...';
-  document.getElementById('convStatus').textContent='⟳ Đang xử lý...';
-  try {
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        messages:[{role:'user',content:`Convert this ${langNames[fromLang]} code to ${langNames[toLang]}. Return ONLY the converted code, no explanation, no markdown fences.\n\n${code}`}]
-      })
-    });
-    const data=await res.json();
-    if(data.error){document.getElementById('convOutput').value=`// Lỗi: ${data.error.message}`;document.getElementById('convStatus').textContent='✗ Lỗi API';return;}
-    const result=data.content.map(i=>i.text||'').join('').replace(/```[\w]*/g,'').replace(/```/g,'').trim();
-    document.getElementById('convOutput').value=result;
-    document.getElementById('convStatus').textContent=`✓ Chuyển đổi xong — ${langNames[fromLang]} → ${langNames[toLang]}`;
-  } catch(e) {
-    document.getElementById('convOutput').value=`// Không thể kết nối API.\n// Đây là bản demo — tính năng AI convert cần API key.\n\n// Converted ${langNames[fromLang]} → ${langNames[toLang]}:\n// [Code would appear here]`;
-    document.getElementById('convStatus').textContent='⚠ Demo mode (no API key)';
-  }
-}
-
-// ── INIT ──
-randomizeArray();
-renderAlgoExplain();
-initCode();
-renderStats();
-</script>
 </body>
 </html>
