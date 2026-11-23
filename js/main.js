@@ -2,8 +2,9 @@ import { icon } from './core/icons.js';
 import { getTheme, setTheme } from './core/store.js';
 import { registerRoute, initRouter } from './core/router.js';
 import { homeView } from './views/home.js';
-import { createModuleView } from './views/module-shell.js';
 import { sortingView } from './views/sorting.view.js';
+import { caroView } from './views/caro.view.js';
+import { game2048View } from './views/game2048.view.js';
 import { rpsView } from './views/rps.view.js';
 
 // Theme
@@ -44,8 +45,8 @@ function initChrome() {
 
 registerRoute('/', homeView);
 registerRoute('/sorting', sortingView);
-registerRoute('/caro', createModuleView({ game: 'caro', title: 'Caro vs AI', subtitle: 'Minimax + Alpha-Beta + Move Ordering.' }));
-registerRoute('/2048', createModuleView({ game: '2048', title: '2048 Expectimax', subtitle: 'Gợi ý và tự chơi với độ sâu thích ứng.' }));
+registerRoute('/caro', caroView);
+registerRoute('/2048', game2048View);
 registerRoute('/rps', rpsView);
 
 initChrome();
