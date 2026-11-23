@@ -1,0 +1,50 @@
+/* Design tokens — Technical Monograph */
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0E1116;
+  --surface: #161B22;
+  --surface-2: #1C2128;
+  --text: #E6EDF3;
+  --text-muted: #8B949E;
+  --border: rgba(255, 255, 255, 0.08);
+  --accent: #5FA777;
+  --accent-hover: #72BC8A;
+  --accent-soft: rgba(95, 167, 119, 0.12);
+  --on-accent: #0B120E;
+  --ok: #4C9F70;
+  --warn: #D4A359;
+  --danger: #D96B52;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #F7F7F4;
+  --surface: #FFFFFF;
+  --surface-2: #F0F0EC;
+  --text: #111318;
+  --text-muted: #57606A;
+  --border: rgba(0, 0, 0, 0.09);
+  --accent: #2D6A4F;
+  --accent-hover: #245740;
+  --accent-soft: rgba(45, 106, 79, 0.09);
+  --on-accent: #FFFFFF;
+  --ok: #2E7D52;
+  --warn: #B07D2B;
+  --danger: #C04A36;
+}
+
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+  --radius: 6px;
+  --topbar-h: 56px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --maxw: 1200px;
+}
