@@ -3,6 +3,8 @@ import { getTheme, setTheme } from './core/store.js';
 import { registerRoute, initRouter } from './core/router.js';
 import { homeView } from './views/home.js';
 import { createModuleView } from './views/module-shell.js';
+import { sortingView } from './views/sorting.view.js';
+import { rpsView } from './views/rps.view.js';
 
 // Theme
 function applyTheme(theme) {
@@ -41,10 +43,10 @@ function initChrome() {
 }
 
 registerRoute('/', homeView);
-registerRoute('/sorting', createModuleView({ game: 'sorting', title: 'Sorting Visualizer', subtitle: 'Bảy thuật toán sắp xếp, thực thi từng bước.' }));
+registerRoute('/sorting', sortingView);
 registerRoute('/caro', createModuleView({ game: 'caro', title: 'Caro vs AI', subtitle: 'Minimax + Alpha-Beta + Move Ordering.' }));
 registerRoute('/2048', createModuleView({ game: '2048', title: '2048 Expectimax', subtitle: 'Gợi ý và tự chơi với độ sâu thích ứng.' }));
-registerRoute('/rps', createModuleView({ game: 'rps', title: 'RPS Markov', subtitle: 'Ma trận chuyển Markov bậc 1 và 3-gram.' }));
+registerRoute('/rps', rpsView);
 
 initChrome();
 initRouter(document.getElementById('app'));
