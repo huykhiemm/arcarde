@@ -1,5 +1,6 @@
 // localStorage wrapper. Keys kept backward compatible: kh-theme, kh-history, kh-2048-best.
 const K_THEME = 'kh-theme';
+const K_SOUND = 'kh-sound';
 const K_HISTORY = 'kh-history';
 const K_BEST_2048 = 'kh-2048-best';
 const MAX_HISTORY = 50;
@@ -28,6 +29,14 @@ export function getTheme() {
 
 export function setTheme(theme) {
   write(K_THEME, theme === 'light' ? 'light' : 'dark');
+}
+
+export function getSound() {
+  return read(K_SOUND, 'off') === 'on';
+}
+
+export function setSound(on) {
+  write(K_SOUND, on ? 'on' : 'off');
 }
 
 export function getHistory(game) {

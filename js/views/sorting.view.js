@@ -1,4 +1,5 @@
-import { icon } from '../core/icons.js';
+import { icon } from '../core/icons.js?v=4.2';
+import * as audio from '../core/audio.js?v=4.2';
 import { ALGOS, createRandomArray, createSortGenerator } from '../engines/sorting.engine.js';
 
 const SPEEDS = [
@@ -14,6 +15,7 @@ export const sortingView = {
     let size = 28;
     let speedMs = 35;
     let arr = createRandomArray(size);
+    let minVal = Math.min(...arr, 0);
     let maxVal = Math.max(...arr, 1);
     let bars = [];
     let gen = null;
@@ -27,13 +29,16 @@ export const sortingView = {
     // Header
     const head = document.createElement('header');
     head.className = 'module__head';
+    const eyebrow = document.createElement('p');
+    eyebrow.className = 'eyebrow';
+    eyebrow.textContent = 'MODULE 01 · GENERATOR ENGINE';
     const h1 = document.createElement('h1');
     h1.className = 'module__title';
     h1.textContent = 'Sorting Visualizer';
     const sub = document.createElement('p');
     sub.className = 'module__sub';
     sub.textContent = 'Bảy thuật toán sắp xếp dạng Generator — cập nhật trực tiếp DOM 60fps, không tạo lại phần tử.';
-    head.append(h1, sub);
+    head.append(eyebrow, h1, sub);
 
     // Two-column layout
     const layout = document.createElement('div');
@@ -229,6 +234,11 @@ export const sortingView = {
     compCard.append(compHead, compDesc, compTable);
     aside.append(teleTitle, grid, compCard);
 
+    stage.style.setProperty('--stagger-index', '0');
+    Array.from(aside.children).forEach((el, idx) => {
+      el.style.setProperty('--stagger-index', String(idx + 1));
+    });
+
     layout.append(stage, aside);
     sec.append(head, layout);
     root.appendChild(sec);
@@ -237,6 +247,7 @@ export const sortingView = {
     function initBarsDom() {
       canvas.replaceChildren();
       bars = [];
+      minVal = Math.min(...arr);
       maxVal = Math.max(...arr, 1);
       for (let i = 0; i < arr.length; i++) {
         const bar = document.createElement('div');
@@ -274,6 +285,12 @@ export const sortingView = {
       comps = snap.comps;
       swaps = snap.swaps;
       arr = a;
+      if (audio.isEnabled()) {
+        const idx = snap.swapping[0] ?? snap.comparing[0] ?? snap.counting[0];
+        if (idx !== undefined) {
+          audio.playSortStep(a[idx], minVal, maxVal);
+        }
+      }
       updateTelemetry();
     }
 
@@ -320,6 +337,7 @@ export const sortingView = {
       const res = gen.next();
       if (res.done) {
         clearTimer();
+        audio.stopAll();
         gen = null;
         status = 'Done';
         for (let i = 0; i < bars.length; i++) {
@@ -345,6 +363,7 @@ export const sortingView = {
     function handlePlayPause() {
       if (status === 'Running') {
         clearTimer();
+        audio.stopAll();
         status = 'Paused';
         updatePlayBtnUI();
         updateTelemetry();
@@ -381,6 +400,7 @@ export const sortingView = {
 
     function resetSort(newRandom = true) {
       clearTimer();
+      audio.stopAll();
       gen = null;
       status = 'Idle';
       comps = 0;
@@ -410,6 +430,7 @@ export const sortingView = {
     updateComplexity();
 
     this._cleanup = () => {
+      audio.stopAll();
       clearTimer();
       gen = null;
       bars = [];

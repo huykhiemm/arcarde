@@ -1,5 +1,6 @@
-import { icon } from '../core/icons.js';
-import { recordMatch, getGameStats } from '../core/store.js';
+import { icon } from '../core/icons.js?v=4.2';
+import * as audio from '../core/audio.js?v=4.2';
+import { recordMatch, getGameStats } from '../core/store.js?v=4.2';
 import { CHOICES, CHOICE_META, evaluateRound, MarkovAI } from '../engines/markov.engine.js';
 
 export const rpsView = {
@@ -23,13 +24,16 @@ export const rpsView = {
     // Header
     const head = document.createElement('header');
     head.className = 'module__head';
+    const eyebrow = document.createElement('p');
+    eyebrow.className = 'eyebrow';
+    eyebrow.textContent = 'MODULE 04 · MARKOV CHAIN';
     const h1 = document.createElement('h1');
     h1.className = 'module__title';
     h1.textContent = 'RPS Markov';
     const sub = document.createElement('p');
     sub.className = 'module__sub';
     sub.textContent = 'Nhận diện chuỗi 3-gram kết hợp ma trận chuyển tiếp Markov bậc 1 trên cửa sổ trượt 30 lượt.';
-    head.append(h1, sub);
+    head.append(eyebrow, h1, sub);
 
     const layout = document.createElement('div');
     layout.className = 'module';
@@ -292,6 +296,11 @@ export const rpsView = {
 
     aside.append(teleTitle, teleGrid, heatCard, statsCard);
 
+    stage.style.setProperty('--stagger-index', '0');
+    Array.from(aside.children).forEach((el, idx) => {
+      el.style.setProperty('--stagger-index', String(idx + 1));
+    });
+
     layout.append(stage, aside);
     sec.append(head, layout);
     root.appendChild(sec);
@@ -487,11 +496,13 @@ export const rpsView = {
         resetMatch(false);
       }
       state.round++;
+      audio.playRpsSelect();
       const cpuChoice = ai.choose(state.smart);
       ai.observe(playerChoice);
       const { outcome, reason } = evaluateRound(playerChoice, cpuChoice);
       if (outcome === 'W') state.p1Wins++;
       else if (outcome === 'L') state.p2Wins++;
+      audio.playRpsResult(outcome === 'W' ? 'win' : outcome === 'L' ? 'lose' : 'draw');
 
       state.history.push({ r: state.round, p1: playerChoice, p2: cpuChoice, outcome, reason });
       finishMatchIfNeeded();
@@ -508,6 +519,7 @@ export const rpsView = {
       }
       if (playerNum === 1) pvpChoices.p1 = choice;
       else pvpChoices.p2 = choice;
+      audio.playRpsSelect();
 
       if (pvpChoices.p1 && pvpChoices.p2) {
         pvpStatus.textContent = 'Cả hai đã chọn! Đang mở kết quả...';
@@ -522,6 +534,7 @@ export const rpsView = {
           const { outcome, reason } = evaluateRound(c1, c2);
           if (outcome === 'W') state.p1Wins++;
           else if (outcome === 'L') state.p2Wins++;
+          audio.playRpsResult(outcome === 'W' ? 'win' : outcome === 'L' ? 'lose' : 'draw');
           state.history.push({ r: state.round, p1: c1, p2: c2, outcome, reason });
           finishMatchIfNeeded();
           pvpStatus.textContent = 'Chọn bí mật cho ván tiếp theo.';
@@ -602,6 +615,7 @@ export const rpsView = {
     this._cleanup = () => {
       document.removeEventListener('keydown', onKeyDown);
       clearPvpTimer();
+      audio.stopAll();
     };
   },
 

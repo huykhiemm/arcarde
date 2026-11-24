@@ -12,11 +12,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap">
-  <link rel="stylesheet" href="css/tokens.css">
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/modules.css">
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&amp;display=swap">
+  <link rel="stylesheet" href="css/tokens.css?v=4.2">
+  <link rel="stylesheet" href="css/base.css?v=4.2">
+  <link rel="stylesheet" href="css/components.css?v=4.2">
+  <link rel="stylesheet" href="css/modules.css?v=4.2">
 </head>
 
 <body>
@@ -34,12 +34,24 @@
       <div class="topbar__actions">
         <a class="btn btn--icon" id="github-link" href="https://github.com/huykhiemm/arcarde" target="_blank"
           rel="noopener noreferrer" aria-label="GitHub repository"></a>
+        <button class="btn btn--icon" id="sound-toggle" type="button" aria-pressed="false"
+          aria-label="Bật âm thanh"></button>
         <button class="btn btn--icon" id="theme-toggle" type="button" aria-label="Đổi giao diện"></button>
       </div>
     </div>
   </header>
   <div class="drawer-backdrop" id="drawer-backdrop"></div>
   <main class="app" id="app"></main>
-  <script type="module" src="js/main.js"></script>
+  <footer class="colophon">
+    <div class="colophon__inner">
+      <span class="colophon__brand">KH / ALGO LAB · Built by Huy Khiêm</span>
+      <nav class="colophon__links" aria-label="Liên kết tác giả">
+        <a class="colophon__link" href="https://github.com/huykhiemm" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+        <a class="colophon__link" href="https://www.facebook.com/hy.khyeum/" target="_blank" rel="noopener noreferrer">Facebook ↗</a>
+        <a class="colophon__link" href="https://www.instagram.com/hy_khyeum/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
+      </nav>
+    </div>
+  </footer>
+  <script type="module" src="js/main.js?v=4.2"></script>
 </body>
 </html>

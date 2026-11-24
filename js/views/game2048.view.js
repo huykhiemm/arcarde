@@ -1,5 +1,6 @@
-import { icon } from '../core/icons.js';
-import { getBest2048, setBest2048, recordMatch, getGameStats } from '../core/store.js';
+import { icon } from '../core/icons.js?v=4.2';
+import * as audio from '../core/audio.js?v=4.2';
+import { getBest2048, setBest2048, recordMatch, getGameStats } from '../core/store.js?v=4.2';
 import {
   GRID_SIZE,
   DIRECTIONS,
@@ -119,13 +120,16 @@ export const game2048View = {
     // Header
     const head = document.createElement('header');
     head.className = 'module__head';
+    const eyebrow = document.createElement('p');
+    eyebrow.className = 'eyebrow';
+    eyebrow.textContent = 'MODULE 03 · EXPECTIMAX LUT';
     const h1 = document.createElement('h1');
     h1.className = 'module__title';
     h1.textContent = '2048 Expectimax';
     const sub = document.createElement('p');
     sub.className = 'module__sub';
     sub.textContent = 'Expectimax 16-bit LUT + Transposition Table + trực quan hóa phân rã 5 thành phần heuristic theo thời gian thực.';
-    head.append(h1, sub);
+    head.append(eyebrow, h1, sub);
 
     const layout = document.createElement('div');
     layout.className = 'module';
@@ -467,6 +471,11 @@ export const game2048View = {
     statsCard.append(statsTitle, statsTable);
     aside.append(teleTitle, evCard, breakdownCard, metricsGrid, statsCard);
 
+    stage.style.setProperty('--stagger-index', '0');
+    Array.from(aside.children).forEach((el, idx) => {
+      el.style.setProperty('--stagger-index', String(idx + 1));
+    });
+
     layout.append(stage, aside);
     sec.append(head, layout);
     root.appendChild(sec);
@@ -794,6 +803,21 @@ export const game2048View = {
       const res = moveState(state, direction);
       if (!res.moved) return false;
 
+      let maxMerged = 0;
+      for (let r = 0; r < state.size; r++) {
+        for (let c = 0; c < state.size; c++) {
+          const t = state.grid[r][c];
+          if (t && t.mergedFrom && t.value > maxMerged) {
+            maxMerged = t.value;
+          }
+        }
+      }
+      if (maxMerged > 0) {
+        audio.play2048Merge(maxMerged);
+      } else {
+        audio.play2048Slide();
+      }
+
       // Clear hint arrow when a move executes
       setBoardHintArrow(null);
 
@@ -804,6 +828,7 @@ export const game2048View = {
 
       if (res.reached2048 && !winRecorded) {
         winRecorded = true;
+        audio.playWinChord();
         setBest2048(state.score);
         recordMatch({
           game: '2048',
@@ -1009,6 +1034,7 @@ export const game2048View = {
       stopAutoPlay();
       cancelPendingWorker();
       flushPendingRemovals();
+      audio.stopAll();
       worker.terminate();
     };
   },

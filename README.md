@@ -19,19 +19,24 @@ Interactive algorithm laboratory & real-time telemetry suite built with zero-bui
 
 ## Architecture
 
-Zero-build **Vanilla ES Modules** (`type="module"`) with a hash-based router (`#/`, `#/sorting`, `#/caro`, `#/2048`, `#/rps`) and strict separation between pure algorithm engines, background Web Workers, and DOM views. Styled with the **Botanical Technical Monograph** design system (Dark `#0E1116` / Light `#F7F7F4`, single Botanical Green accent `#5FA777` / `#2D6A4F`, `tabular-nums` telemetry).
+Zero-build **Vanilla ES Modules** (`type="module"`) with a hash-based router (`#/`, `#/sorting`, `#/caro`, `#/2048`, `#/rps`) and strict separation between pure algorithm engines, background Web Workers, and DOM views.
+
+### v4.2 — Kinetic Monograph & Unified Tactile Audio
+- **Editorial Typography & Tactile Surfaces:** Pairs `Newsreader` (editorial serif display titles with `text-wrap: balance`) with `Inter` (UI) and `JetBrains Mono` (`tabular-nums` telemetry), subtle static paper grain (`feTurbulence`), top-edge card highlights, and `140ms` button press physics.
+- **Home Specimen Showcase & Choreography:** Four technical SVG specimen diagrams (Sorting bars, Caro 5-in-a-row, 2048 snake path, RPS Markov cycle) with self-drawing strokes, hover micro-motions, cursor sheen (`@media (hover: hover)`), stepped kinetic highlight on *"từng bước."*, and staggered route entrance (`prefers-reduced-motion` compliant).
+- **Unified Web Audio Synth (`js/core/audio.js`):** Zero-asset procedural audio controlled by a global Topbar toggle (`localStorage`, default **OFF**): triangle sweep for Sorting, wood/stone clicks + win chord for Caro, mechanical slide + throttled pentatonic marimba merges for 2048, and tactile switch/interval feedback for RPS.
 
 ```mermaid
 flowchart LR
     subgraph Core["js/core/"]
         Router["router.js (Hash Router)"]
-        Store["store.js (Theme & State)"]
+        Store["store.js (Theme, Sound & State)"]
+        Audio["audio.js (Web Audio Synth)"]
         Icons["icons.js (Inline SVG)"]
     end
 
     subgraph Views["js/views/"]
         Home["home.js"]
-        Shell["module-shell.js"]
         SortV["sorting.view.js"]
         CaroV["caro.view.js"]
         G2048V["game2048.view.js"]
@@ -52,6 +57,7 @@ flowchart LR
 
     Router --> Views
     Store --> Views
+    Audio --> Views
     Icons --> Views
     SortV --> SortE
     RpsV --> MarkovE

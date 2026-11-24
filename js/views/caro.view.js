@@ -1,5 +1,6 @@
-import { icon } from '../core/icons.js';
-import { recordMatch, getGameStats } from '../core/store.js';
+import { icon } from '../core/icons.js?v=4.2';
+import * as audio from '../core/audio.js?v=4.2';
+import { recordMatch, getGameStats } from '../core/store.js?v=4.2';
 import {
   CARO_SIZE,
   PLAYER_HUMAN,
@@ -18,6 +19,14 @@ const DIFFICULTIES = [
 
 const STAR_POINTS = new Set(['3,3', '3,11', '7,7', '11,3', '11,11']);
 const COL_LABELS = 'ABCDEFGHIJKLMNO';
+
+// Crisp inline SVG marks; pathLength=1 lets CSS draw the stroke of the newest move.
+function markSvg(kind) {
+  const body = kind === 'x'
+    ? '<path pathLength="1" d="M6.2 6.2L17.8 17.8"/><path pathLength="1" d="M17.8 6.2L6.2 17.8"/>'
+    : '<circle pathLength="1" cx="12" cy="12" r="6.5"/>';
+  return `<svg class="caro-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" aria-hidden="true" focusable="false">${body}</svg>`;
+}
 
 export const caroView = {
   mount(root) {
@@ -47,13 +56,16 @@ export const caroView = {
     // Header
     const head = document.createElement('header');
     head.className = 'module__head';
+    const eyebrow = document.createElement('p');
+    eyebrow.className = 'eyebrow';
+    eyebrow.textContent = 'MODULE 02 · ALPHA-BETA WORKER';
     const h1 = document.createElement('h1');
     h1.className = 'module__title';
     h1.textContent = 'Caro vs AI';
     const sub = document.createElement('p');
     sub.className = 'module__sub';
     sub.textContent = 'Bàn cờ 15×15 · Minimax + cắt tỉa Alpha-Beta + Move Ordering chạy trong Web Worker.';
-    head.append(h1, sub);
+    head.append(eyebrow, h1, sub);
 
     const layout = document.createElement('div');
     layout.className = 'module';
@@ -142,7 +154,29 @@ export const caroView = {
       }
     }
 
-    boardWrap.appendChild(boardEl);
+    // Technical coordinate frame: A–O columns on top, 1–15 rows on the left
+    const frame = document.createElement('div');
+    frame.className = 'caro-frame';
+    const colsEl = document.createElement('div');
+    colsEl.className = 'caro-cols';
+    colsEl.setAttribute('aria-hidden', 'true');
+    const rowsEl = document.createElement('div');
+    rowsEl.className = 'caro-rows';
+    rowsEl.setAttribute('aria-hidden', 'true');
+    const colLabelEls = [];
+    const rowLabelEls = [];
+    for (let i = 0; i < CARO_SIZE; i++) {
+      const cs = document.createElement('span');
+      cs.textContent = COL_LABELS[i];
+      colsEl.appendChild(cs);
+      colLabelEls.push(cs);
+      const rs = document.createElement('span');
+      rs.textContent = String(i + 1);
+      rowsEl.appendChild(rs);
+      rowLabelEls.push(rs);
+    }
+    frame.append(colsEl, rowsEl, boardEl);
+    boardWrap.appendChild(frame);
 
     // Legend
     const legend = document.createElement('div');
@@ -241,6 +275,11 @@ export const caroView = {
     statsCard.append(statsTitle, statsTable);
     aside.append(teleTitle, teleGrid, searchCard, statsCard);
 
+    stage.style.setProperty('--stagger-index', '0');
+    Array.from(aside.children).forEach((el, idx) => {
+      el.style.setProperty('--stagger-index', String(idx + 1));
+    });
+
     layout.append(stage, aside);
     sec.append(head, layout);
     root.appendChild(sec);
@@ -266,15 +305,16 @@ export const caroView = {
       if (prevVal !== val) {
         btn.dataset.val = val;
         if (val === PLAYER_HUMAN) {
-          btn.innerHTML = icon('mark-x', 16);
+          btn.innerHTML = markSvg('x');
         } else if (val === PLAYER_AI) {
-          btn.innerHTML = icon('mark-o', 15);
+          btn.innerHTML = markSvg('o');
         } else {
           btn.replaceChildren();
         }
         btn.setAttribute('aria-label', formatCellLabel(r, c, val));
       }
 
+      btn.classList.toggle('is-axis', lastMove !== null && (lastMove[0] === r || lastMove[1] === c));
       btn.classList.toggle('is-x', val === PLAYER_HUMAN);
       btn.classList.toggle('is-o', val === PLAYER_AI);
       btn.classList.toggle('is-last-move', isLast);
@@ -289,6 +329,10 @@ export const caroView = {
         }
       }
       boardEl.classList.toggle('is-thinking', aiThinking);
+      for (let i = 0; i < CARO_SIZE; i++) {
+        colLabelEls[i].classList.toggle('is-axis', lastMove !== null && lastMove[1] === i);
+        rowLabelEls[i].classList.toggle('is-axis', lastMove !== null && lastMove[0] === i);
+      }
     }
 
     function setStatus(text, tone = '') {
@@ -325,6 +369,9 @@ export const caroView = {
       gameOver = true;
       aiThinking = false;
       winSet = new Set((winCells || []).map(([r, c]) => `${r},${c}`));
+      if (winCells && winCells.length >= 5) {
+        audio.playWinChord();
+      }
       recordMatch({
         game: 'caro',
         difficulty,
@@ -342,6 +389,7 @@ export const caroView = {
       board[r][c] = PLAYER_HUMAN;
       lastMove = [r, c];
       moveCount++;
+      audio.playCaroMove(false);
 
       const win = checkWin(board, r, c, PLAYER_HUMAN);
       if (win) {
@@ -396,6 +444,7 @@ export const caroView = {
       board[r][c] = PLAYER_AI;
       lastMove = [r, c];
       moveCount++;
+      audio.playCaroMove(true);
 
       const win = checkWin(board, r, c, PLAYER_AI);
       if (win) {
@@ -450,6 +499,7 @@ export const caroView = {
 
     this._cleanup = () => {
       requestId++;
+      audio.stopAll();
       worker.terminate();
     };
   },

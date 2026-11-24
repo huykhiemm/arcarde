@@ -1,11 +1,12 @@
-import { icon } from './core/icons.js';
-import { getTheme, setTheme } from './core/store.js';
-import { registerRoute, initRouter } from './core/router.js';
-import { homeView } from './views/home.js';
-import { sortingView } from './views/sorting.view.js';
-import { caroView } from './views/caro.view.js';
-import { game2048View } from './views/game2048.view.js';
-import { rpsView } from './views/rps.view.js';
+import { icon } from './core/icons.js?v=4.2';
+import { getTheme, setTheme } from './core/store.js?v=4.2';
+import * as audio from './core/audio.js?v=4.2';
+import { registerRoute, initRouter } from './core/router.js?v=4.2';
+import { homeView } from './views/home.js?v=4.2';
+import { sortingView } from './views/sorting.view.js?v=4.2';
+import { caroView } from './views/caro.view.js?v=4.2';
+import { game2048View } from './views/game2048.view.js?v=4.2';
+import { rpsView } from './views/rps.view.js?v=4.2';
 
 // Theme
 function applyTheme(theme) {
@@ -15,6 +16,17 @@ function applyTheme(theme) {
     btn.innerHTML = icon(theme === 'dark' ? 'sun' : 'moon', 18);
     btn.setAttribute('aria-label', theme === 'dark' ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối');
   }
+}
+
+// Global tactile audio toggle
+function syncSoundBtn() {
+  const btn = document.getElementById('sound-toggle');
+  if (!btn) return;
+  const on = audio.isEnabled();
+  btn.innerHTML = icon(on ? 'volume' : 'volume-off', 18);
+  btn.setAttribute('aria-pressed', String(on));
+  btn.setAttribute('aria-label', on ? 'Tắt âm thanh tương tác' : 'Bật âm thanh tương tác');
+  btn.title = on ? 'Âm thanh: Bật' : 'Âm thanh: Tắt';
 }
 
 function initChrome() {
@@ -34,6 +46,22 @@ function initChrome() {
   backdrop.addEventListener('click', () => setDrawer(false));
   window.addEventListener('routechange', () => setDrawer(false));
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setDrawer(false); });
+
+  const soundBtn = document.getElementById('sound-toggle');
+  if (!audio.isSupported()) {
+    soundBtn.disabled = true;
+  } else {
+    soundBtn.addEventListener('click', () => {
+      audio.toggle();
+    });
+  }
+  audio.onChange(syncSoundBtn);
+  syncSoundBtn();
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) audio.suspend();
+    else audio.resume();
+  });
 
   document.getElementById('theme-toggle').addEventListener('click', () => {
     const next = getTheme() === 'dark' ? 'light' : 'dark';
